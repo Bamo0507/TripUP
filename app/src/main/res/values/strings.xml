@@ -40,4 +40,11 @@
     <string name="add_to_itinerary_from_explore_indication">Please select an itinerary</string>
     <string name="add_to_itinerary_complete_button">Complete</string>
 
+    <!-- Account Page -->
+    <string name="your_favorites">Your Favorites</string>
+    <string name="past_trips">Past Trips</string>
+    <string name="logout">Log Out</string>
+
+
+
 </resources>

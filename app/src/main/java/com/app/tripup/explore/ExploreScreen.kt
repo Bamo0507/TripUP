@@ -33,7 +33,10 @@ fun ExploreScreen(modifier: Modifier = Modifier) {
 
     Scaffold(
         bottomBar = {
-            BottomNavigationBar()
+            BottomNavigationBar(
+                selectedItem = 0,
+                onItemSelected = { /* Manejar clic en la barra de navegación */ }
+            )
         }
     ) { innerPadding ->
         Column(

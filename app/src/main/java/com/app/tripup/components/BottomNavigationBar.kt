@@ -22,8 +22,10 @@ import androidx.compose.ui.unit.dp
 import com.app.tripup.R
 
 @Composable
-fun BottomNavigationBar() {
-    var selectedItem by remember { mutableStateOf(0) }
+fun BottomNavigationBar(
+    selectedItem: Int,
+    onItemSelected: (Int) -> Unit
+) {
     val items = listOf(
         NavigationItem.Explore,
         NavigationItem.Itinerary,
@@ -39,7 +41,7 @@ fun BottomNavigationBar() {
 
             NavigationBarItem(
                 selected = isSelected,
-                onClick = { selectedItem = index },
+                onClick = { onItemSelected(index) },
                 icon = {
                     if (isSelected) {
                         Card(
@@ -51,16 +53,14 @@ fun BottomNavigationBar() {
                             modifier = Modifier
                                 .size(width = 80.dp, height = 40.dp)
                         ) {
-                            Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()){
+                            Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()) {
                                 Icon(
                                     imageVector = item.icon,
                                     contentDescription = null,
                                     tint = MaterialTheme.colorScheme.onSurface,
-                                    modifier = Modifier
-                                        .padding(8.dp)
+                                    modifier = Modifier.padding(8.dp)
                                 )
                             }
-
                         }
                     } else {
                         Icon(
