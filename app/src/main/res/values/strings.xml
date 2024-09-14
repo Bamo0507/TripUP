@@ -32,6 +32,12 @@
     <string name="add_button">Add</string>
     <string name="search_online_button">Search Online</string>
 
-    <!-- Accesibilidad -->
+    <!-- Accesibility -->
     <string name="favorite_button">Favorite</string>
+
+    <!-- Adding from Explore to Itinerary -->
+    <string name="add_to_itinerary_from_explore">Adding a New Adventure!</string>
+    <string name="add_to_itinerary_from_explore_indication">Please select an itinerary</string>
+    <string name="add_to_itinerary_complete_button">Complete</string>
+
 </resources>
