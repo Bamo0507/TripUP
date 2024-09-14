@@ -6,5 +6,32 @@
     <string name="signup_google">Sign Up with Google</string>
     <string name="signup_error">Wrong User or Password</string>
 
+    <!-- Navegation bar strings -->
+    <string name="nav_explore">Explore</string>
+    <string name="nav_itinerary">Itinerary</string>
+    <string name="nav_account">Account</string>
+    <string name="search_placeholder">Try &quot;Guatemala&quot;</string>
 
+    <!-- Explore screen strings -->
+    <string name="explore_near_you">Near You!</string>
+    <string name="category_restaurants">Restaurants</string>
+    <string name="category_hotels">Hotels</string>
+    <string name="category_drinks">Drinks</string>
+    <string name="category_activities">Activities</string>
+
+    <!-- Place detail screen strings -->
+    <string name="place_add_button">Add</string>
+    <string name="place_search_online_button">Search Online</string>
+
+    <!-- Search result screen strings -->
+    <string name="search_results_for">%1$s</string>
+    <string name="search_no_results">Not finding the places you were hoping for? Try refining your search.</string>
+    <string name="back_button">Back</string>
+
+    <!-- Botones Location info -->
+    <string name="add_button">Add</string>
+    <string name="search_online_button">Search Online</string>
+
+    <!-- Accesibilidad -->
+    <string name="favorite_button">Favorite</string>
 </resources>

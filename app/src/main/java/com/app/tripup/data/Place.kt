@@ -9,7 +9,6 @@ data class Place(
     val name: String,
     val location: String,
     val imageUrl: String,
-    val rating: Double, // Para agregar una calificación o rating
     val description: String,
     val category: PlaceCategory,
     val isFavorite: Boolean = false // Para indicar si el lugar ha sido marcado como favorito
