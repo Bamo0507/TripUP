@@ -117,12 +117,16 @@ fun AccountScreen(modifier: Modifier = Modifier, userName: String) {
                     label = stringResource(id = R.string.your_favorites),
                     iconTint = MaterialTheme.colorScheme.tertiaryContainer
                 )
-                Spacer(modifier = Modifier.height(16.dp))
+                //EN DEBATE DE SI SE AGREGARÁ
+                // Spacer(modifier = Modifier.height(16.dp))
+                /*
                 AccountOption(
                     icon = Icons.Default.Send,
                     label = stringResource(id = R.string.past_trips),
                     iconTint = MaterialTheme.colorScheme.secondary
                 )
+                */
+
                 Spacer(modifier = Modifier.height(16.dp))
                 AccountOption(
                     icon = Icons.Default.ExitToApp,
