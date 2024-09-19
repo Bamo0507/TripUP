@@ -153,7 +153,7 @@ fun ActivityCompleteButton(isFormComplete: Boolean, modifier: Modifier = Modifie
             .height(48.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = if (isFormComplete) {
-                MaterialTheme.colorScheme.primary 
+                MaterialTheme.colorScheme.primary
             } else {
                 MaterialTheme.colorScheme.secondary
             }
