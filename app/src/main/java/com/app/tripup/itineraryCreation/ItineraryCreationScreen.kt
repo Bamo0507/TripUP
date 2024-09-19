@@ -155,7 +155,7 @@ fun JourneyCompleteButton(isFormComplete: Boolean, modifier: Modifier = Modifier
 @Composable
 fun PreviewBeforeFilled() {
     CreateJourneyScreen(
-        title = "", 
+        title = "",
         startTime = ""
     )
 }
