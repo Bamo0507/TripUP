@@ -212,3 +212,13 @@ fun LoginScreenPreviewDarkMode() {
         }
     }
 }
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun LoginScreenPreviewDarkModewithError() {
+    MyApplicationTheme(darkTheme = true) {
+        Surface(modifier = Modifier.fillMaxSize()) {
+            LoginScreen(isError = true) // Dark mode sin error
+        }
+    }
+}

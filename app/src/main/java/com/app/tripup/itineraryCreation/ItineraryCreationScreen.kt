@@ -148,9 +148,13 @@ fun JourneyCompleteButton(isFormComplete: Boolean, modifier: Modifier = Modifier
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
-            Icon(Icons.Filled.Check, contentDescription = "Check icon")
+            Icon(Icons.Filled.Check, contentDescription = "Check icon",
+                tint = if (isFormComplete) MaterialTheme.colorScheme.onPrimary
+            else MaterialTheme.colorScheme.onTertiaryContainer)
             Spacer(modifier = Modifier.width(7.dp))
-            Text(text = stringResource(id = R.string.complete_button))
+            Text(text = stringResource(id = R.string.complete_button),
+                color = if (isFormComplete) MaterialTheme.colorScheme.onPrimary
+                else MaterialTheme.colorScheme.onTertiaryContainer)
         }
     }
 }
