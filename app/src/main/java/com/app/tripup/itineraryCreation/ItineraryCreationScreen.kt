@@ -1,4 +1,5 @@
 package com.app.tripup.itineraryCreation
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -9,9 +10,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.app.tripup.R
+import com.app.tripup.ui.theme.MyApplicationTheme
 
 @Composable
 fun CreateJourneyScreen(
@@ -47,7 +51,7 @@ fun CreateJourneyScreen(
                 )
 
                 Text(
-                    text = "Give your trip a memorable name",
+                    text = stringResource(id = R.string.memorable_name),
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier
@@ -60,7 +64,7 @@ fun CreateJourneyScreen(
 
                 JourneyTextField(
                     value = startTimeState,
-                    label = "Start time",
+                    label = stringResource(id = R.string.date_interval),
                     placeholder = "Input",
                     onValueChange = { startTimeState = it }
                 )
@@ -79,14 +83,14 @@ fun CreateJourneyScreen(
 @Composable
 fun JourneyTopAppBar(onBackClick: () -> Unit) {
     TopAppBar(
-        title = { Text(text = "Create Your Journey") },
+        title = { Text(text = stringResource(id = R.string.create_journey)) },
         navigationIcon = {
             IconButton(onClick = onBackClick) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.surface,
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
             titleContentColor = MaterialTheme.colorScheme.onSurface,
             navigationIconContentColor = MaterialTheme.colorScheme.onSurface
         )
@@ -135,7 +139,7 @@ fun JourneyCompleteButton(isFormComplete: Boolean, modifier: Modifier = Modifier
             containerColor = if (isFormComplete) {
                 MaterialTheme.colorScheme.primary // Si el formulario está completo
             } else {
-                MaterialTheme.colorScheme.secondary // Si el formulario no está completo
+                MaterialTheme.colorScheme.tertiaryContainer // Si el formulario no está completo
             }
         ),
         shape = CircleShape
@@ -146,7 +150,7 @@ fun JourneyCompleteButton(isFormComplete: Boolean, modifier: Modifier = Modifier
         ) {
             Icon(Icons.Filled.Check, contentDescription = "Check icon")
             Spacer(modifier = Modifier.width(7.dp))
-            Text(text = "Complete")
+            Text(text = stringResource(id = R.string.complete_button))
         }
     }
 }
@@ -154,18 +158,44 @@ fun JourneyCompleteButton(isFormComplete: Boolean, modifier: Modifier = Modifier
 @Preview(showBackground = true)
 @Composable
 fun PreviewBeforeFilled() {
-    CreateJourneyScreen(
-        title = "",
-        startTime = ""
-    )
+    MyApplicationTheme {
+        CreateJourneyScreen(
+            title = "",
+            startTime = ""
+        )
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun PreviewAfterFilled() {
-    CreateJourneyScreen(
-        title = "Family Trip",
-        startTime = "08/16/2024 - 08/27/2024"
-    )
+    MyApplicationTheme {
+        CreateJourneyScreen(
+            title = "Family Trip",
+            startTime = "08/16/2024 - 08/27/2024"
+        )
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun PreviewBeforeFilledDark() {
+    MyApplicationTheme {
+        CreateJourneyScreen(
+            title = "",
+            startTime = ""
+        )
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun PreviewAfterFilledDark() {
+    MyApplicationTheme {
+        CreateJourneyScreen(
+            title = "Family Trip",
+            startTime = "08/16/2024 - 08/27/2024"
+        )
+    }
 }
 

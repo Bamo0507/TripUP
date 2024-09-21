@@ -1,5 +1,6 @@
 package com.app.tripup.dayActv
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -10,9 +11,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.app.tripup.R
+import com.app.tripup.ui.theme.MyApplicationTheme
 
 @Composable
 fun CreateActivityScreen(
@@ -45,13 +49,13 @@ fun CreateActivityScreen(
 
                 ActivityTextField(
                     value = activityNameState,
-                    label = "Activity Name",
+                    label = stringResource(id = R.string.activity_name),
                     placeholder = "Input",
                     onValueChange = { activityNameState = it }
                 )
 
                 Text(
-                    text = "What are we doing?",
+                    text = stringResource(id = R.string.phrase_actv),
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier
@@ -68,7 +72,7 @@ fun CreateActivityScreen(
 
                     ActivityTextField(
                         value = startTimeState,
-                        label = "Start time",
+                        label = stringResource(id = R.string.start_time),
                         placeholder = "8:00 AM",
                         onValueChange = { startTimeState = it },
                         modifier = Modifier.weight(1f)
@@ -77,7 +81,7 @@ fun CreateActivityScreen(
 
                     ActivityTextField(
                         value = endTimeState,
-                        label = "End time",
+                        label = stringResource(id = R.string.end_time),
                         placeholder = "8:00 AM",
                         onValueChange = { endTimeState = it },
                         modifier = Modifier.weight(1f)
@@ -98,6 +102,8 @@ fun CreateActivityScreen(
 @Composable
 fun ActivityTopAppBar(onBackClick: () -> Unit) {
     TopAppBar(
+        //De momento se dejará así más adelante se implementará la lógica
+        //El título que se muestra dependerá de lo que el usuario haya seleccionado en la pantalla anterior
         title = { Text(text = "Family Trip/August 5") },
         navigationIcon = {
             IconButton(onClick = onBackClick) {
@@ -105,7 +111,7 @@ fun ActivityTopAppBar(onBackClick: () -> Unit) {
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.surface,
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
             titleContentColor = MaterialTheme.colorScheme.onSurface,
             navigationIconContentColor = MaterialTheme.colorScheme.onSurface
         )
@@ -136,7 +142,6 @@ fun ActivityTextField(
         },
         colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = MaterialTheme.colorScheme.primary,
-            unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
             cursorColor = MaterialTheme.colorScheme.primary
         ),
         shape = MaterialTheme.shapes.medium
@@ -155,7 +160,7 @@ fun ActivityCompleteButton(isFormComplete: Boolean, modifier: Modifier = Modifie
             containerColor = if (isFormComplete) {
                 MaterialTheme.colorScheme.primary
             } else {
-                MaterialTheme.colorScheme.secondary
+                MaterialTheme.colorScheme.tertiaryContainer
             }
         ),
         shape = CircleShape
@@ -164,29 +169,63 @@ fun ActivityCompleteButton(isFormComplete: Boolean, modifier: Modifier = Modifie
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
-            Icon(Icons.Filled.Check, contentDescription = "Check icon")
+            Icon(Icons.Filled.Check, contentDescription = "Check icon",
+                tint = if (isFormComplete) MaterialTheme.colorScheme.onPrimary else
+                    MaterialTheme.colorScheme.onTertiaryContainer)
             Spacer(modifier = Modifier.width(7.dp))
-            Text(text = "Complete")
+            Text(text = stringResource(id = R.string.complete_button),
+                color = if (isFormComplete) MaterialTheme.colorScheme.onPrimary else
+                    MaterialTheme.colorScheme.onTertiaryContainer
+                )
         }
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun PreviewBeforeFilled() {
-    CreateActivityScreen(
-        activityName = "",
-        startTime = "",
-        endTime = ""
-    )
+fun PreviewBeforeFilledLight() {
+    MyApplicationTheme {
+        CreateActivityScreen(
+            activityName = "",
+            startTime = "",
+            endTime = ""
+        )
+    }
+
 }
 
 @Preview(showBackground = true)
 @Composable
-fun PreviewAfterFilled() {
-    CreateActivityScreen(
-        activityName = "UNO's Restaurant",
-        startTime = "8:00 AM",
-        endTime = "7:00 PM"
-    )
+fun PreviewAfterFilledLight() {
+    MyApplicationTheme {
+        CreateActivityScreen(
+            activityName = "UNO's Restaurant",
+            startTime = "8:00 AM",
+            endTime = "7:00 PM"
+        )
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun PreviewBeforeFilledDark() {
+    MyApplicationTheme {
+        CreateActivityScreen(
+            activityName = "",
+            startTime = "",
+            endTime = ""
+        )
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun PreviewAfterFilledDark() {
+    MyApplicationTheme {
+        CreateActivityScreen(
+            activityName = "UNO's Restaurant",
+            startTime = "8:00 AM",
+            endTime = "7:00 PM"
+        )
+    }
 }

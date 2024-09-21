@@ -1,5 +1,6 @@
 package com.app.tripup.itinerarySelection
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -12,10 +13,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.app.tripup.R
+import com.app.tripup.ui.theme.MyApplicationTheme
 
 @Composable
 fun DatesListScreen(
@@ -33,8 +37,16 @@ fun DatesListScreen(
                 .padding(innerPadding)
                 .padding(16.dp)
         ) {
-
-            val dates = listOf("August 5", "August 6", "August 7", "August 8", "August 9", "August 10")
+            //más adelante se aplicará la lógica necesaria
+            //se tendrá un día por cada uno de los días que se encuentren en el intervalo de fechas
+            val dates = listOf(
+                stringResource(R.string.Day1_example),
+                stringResource(R.string.Day2_example),
+                stringResource(R.string.Day3_example),
+                stringResource(R.string.Day4_example),
+                stringResource(R.string.Day5_example),
+                stringResource(R.string.Day6_example)
+            )
 
             Column(modifier = Modifier.fillMaxWidth()) {
                 dates.forEach { date ->
@@ -53,14 +65,14 @@ fun DatesListScreen(
 @Composable
 fun DatesTopAppBar(onBackClick: () -> Unit) {
     TopAppBar(
-        title = { Text(text = "Family Trip") },
+        title = { Text(text = stringResource(id = R.string.itinerary_title_example)) },
         navigationIcon = {
             IconButton(onClick = onBackClick) {
                 Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color.LightGray,
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
             titleContentColor = MaterialTheme.colorScheme.onSurface,
             navigationIconContentColor = MaterialTheme.colorScheme.onSurface
         )
@@ -123,5 +135,18 @@ fun SolidColorBox(color: Color) {
 @Preview(showBackground = true)
 @Composable
 fun PreviewDatesListScreen() {
-    DatesListScreen()
+    MyApplicationTheme {
+        DatesListScreen()
+
+    }
 }
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun PreviewDatesListScreenDark() {
+    MyApplicationTheme {
+        DatesListScreen()
+
+    }
+}
+

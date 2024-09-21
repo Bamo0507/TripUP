@@ -1,5 +1,6 @@
 package com.app.tripup.itineraryMain
 
+import android.content.res.Configuration
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -8,7 +9,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Commute
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Explore
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -21,6 +25,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.app.tripup.R
+import com.app.tripup.ui.theme.MyApplicationTheme
 
 
 @Composable
@@ -31,9 +37,6 @@ fun JourneyListScreen(
     onEditClick: () -> Unit = {}
 ) {
     Scaffold(
-        topBar = {
-            JourneyTopAppBar(onBackClick = onBackClick)
-        },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onEditClick,
@@ -53,9 +56,10 @@ fun JourneyListScreen(
                 .padding(innerPadding)
                 .padding(16.dp)
         ) {
-
+            Spacer(modifier = Modifier.height(20.dp))
             ItineraryCardWithColorBox(
-                title = "Family Trip",
+                title = stringResource(id = R.string.itinerary_title_example), //Más adelante se agregará la función adecuada
+                //Se tendrá una carta por cada una de las cards que el usuario tenga, es decir, por cada itinerario
                 isSelected = false,
                 onCardClick = { /* Acción al hacer clic en la tarjeta */ }
             )
@@ -63,23 +67,6 @@ fun JourneyListScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun JourneyTopAppBar(onBackClick: () -> Unit) {
-    TopAppBar(
-        title = { Text(text = "Family Trip") },
-        navigationIcon = {
-            IconButton(onClick = onBackClick) {
-                Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
-            }
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-            titleContentColor = MaterialTheme.colorScheme.onSurface,
-            navigationIconContentColor = MaterialTheme.colorScheme.onSurface
-        )
-    )
-}
 
 @Composable
 fun ItineraryCardWithColorBox(
@@ -117,7 +104,7 @@ fun ItineraryCardWithColorBox(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "A",
+                        text = stringResource(id = R.string.icon_example),
                         color = Color.White,
                         style = MaterialTheme.typography.bodyMedium
                     )
@@ -222,5 +209,16 @@ sealed class NavigationItem(val icon: ImageVector, val title: Int) {
 @Preview(showBackground = true)
 @Composable
 fun PreviewJourneyListScreen() {
-    JourneyListScreen(selectedItem = 1, onItemSelected = {})
+    MyApplicationTheme {
+        JourneyListScreen(selectedItem = 1, onItemSelected = {})
+    }
 }
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun PreviewJourneyListScreenDarkMode() {
+    MyApplicationTheme {
+        JourneyListScreen(selectedItem = 1, onItemSelected = {})
+    }
+}
+

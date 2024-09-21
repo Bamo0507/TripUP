@@ -1,5 +1,6 @@
 package com.app.tripup.addInfoDay
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -14,10 +15,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.app.tripup.R
+import com.app.tripup.ui.theme.MyApplicationTheme
 
 @Composable
 fun ActivityListScreen(
@@ -32,9 +36,11 @@ fun ActivityListScreen(
             FloatingActionButton(
                 onClick = onAddClick,
                 shape = RoundedCornerShape(16.dp),
-                containerColor = MaterialTheme.colorScheme.secondary
+                containerColor = MaterialTheme.colorScheme.primaryContainer
             ) {
-                Icon(Icons.Filled.Add, contentDescription = "Add", tint = Color.White)
+                Icon(Icons.Filled.Add,
+                    contentDescription = "Add",
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer)
             }
         }
     ) { innerPadding ->
@@ -46,17 +52,17 @@ fun ActivityListScreen(
         ) {
 
             ItineraryCard(
-                title = "Florida Mall - Shopping",
-                startTime = "8:00 AM",
-                endTime = "17:00 PM",
+                title = stringResource(id = R.string.activity_name_example),
+                startTime = stringResource(id = R.string.start_time_example),
+                endTime = stringResource(id = R.string.end_time_example),
                 isSelected = false,
                 onCardClick = { /* Acción al hacer clic en la tarjeta */ }
             )
             Spacer(modifier = Modifier.height(8.dp))
             ItineraryCard(
-                title = "Disney World",
-                startTime = "9:00 AM",
-                endTime = "22:00 PM",
+                title = stringResource(id = R.string.activity_name_example_2),
+                startTime = stringResource(id = R.string.start_time_example_2),
+                endTime = stringResource(id = R.string.end_time_example_2),
                 isSelected = false,
                 onCardClick = { /* Acción al hacer clic en la tarjeta */ }
             )
@@ -68,14 +74,15 @@ fun ActivityListScreen(
 @Composable
 fun ActivityTopAppBar(onBackClick: () -> Unit) {
     TopAppBar(
-        title = { Text(text = "Family Trip/August 5") },
+        //No se agrega a Strings ya que es algo variable que viene de pantalla anterior
+        title = { Text(text = stringResource(id = R.string.list_of_activities_title)) },
         navigationIcon = {
             IconButton(onClick = onBackClick) {
                 Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.surface,
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
             titleContentColor = MaterialTheme.colorScheme.onSurface,
             navigationIconContentColor = MaterialTheme.colorScheme.onSurface
         )
@@ -146,5 +153,15 @@ fun SolidColorBox(color: Color) {
 @Preview(showBackground = true)
 @Composable
 fun PreviewActivityListScreen() {
-    ActivityListScreen()
+    MyApplicationTheme {
+        ActivityListScreen()
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun PreviewActivityListScreenDarkMode() {
+    MyApplicationTheme {
+        ActivityListScreen()
+    }
 }

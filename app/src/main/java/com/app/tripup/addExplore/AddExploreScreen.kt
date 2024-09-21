@@ -48,10 +48,13 @@ fun AddExploreScreen(
                     Icon(
                         imageVector = Icons.Default.Check,
                         contentDescription = "Completed Icon",
-                        tint = MaterialTheme.colorScheme.onPrimary
+                        tint = if (isAnySelected) MaterialTheme.colorScheme.onPrimary else
+                        MaterialTheme.colorScheme.onTertiaryContainer
                     )
                     Spacer(modifier = Modifier.size(16.dp))
-                    Text(text = stringResource(id = R.string.add_to_itinerary_complete_button))
+                    Text(text = stringResource(id = R.string.add_to_itinerary_complete_button),
+                         color = if (isAnySelected) MaterialTheme.colorScheme.onPrimary else
+                    MaterialTheme.colorScheme.onTertiaryContainer)
                 }
             }
 

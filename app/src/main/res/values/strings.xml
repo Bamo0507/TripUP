@@ -45,6 +45,44 @@
     <string name="past_trips">Past Trips</string>
     <string name="logout">Log Out</string>
 
+    <!-- Day Actv Screen -->
+    <string name="activity_name">Activity Name</string>
+    <string name="start_time">Start Time</string>
+    <string name="end_time">End Time</string>
+    <string name="complete_button">Complete</string>
+    <string name="phrase_actv">What are we doing?</string>
+
+    <!-- Itinerary Creation Screen -->
+    <string name="itinerary_title">Itinerary Title</string>
+    <string name="date_interval">Start date - End date</string>
+    <string name="create_journey">Create Your Journey</string>
+    <string name="memorable_name">Give your trip a memorable name</string>>
+
+    <!-- Itinerary Creation Screen -->
+    <string name="itinerary_title_example">Family Trip</string>
+    <string name="icon_example">A</string>
+
+    <!-- List of days for an itinerary -->
+    <string name="Day1_example">August 5</string>
+    <string name="Day2_example">August 6</string>
+    <string name="Day3_example">August 7</string>
+    <string name="Day4_example">August 8</string>
+    <string name="Day5_example">August 9</string>
+    <string name="Day6_example">August 10</string>
+
+    <!-- List of activities for a day -->
+    <string name="list_of_activities_title">Family Trip/August 5</string>
+    <string name="activity_name_example">Florida Mall - Shopping</string>
+    <string name="start_time_example">8:00 AM</string>
+    <string name="end_time_example">17:00 PM</string>
+    <string name="activity_name_example_2">Disney World</string>
+    <string name="start_time_example_2">9:00 AM</string>
+    <string name="end_time_example_2">22:00 PM</string>
+
+
+
+
+
 
 
 </resources>
