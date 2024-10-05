@@ -79,10 +79,5 @@
     <string name="start_time_example_2">9:00 AM</string>
     <string name="end_time_example_2">22:00 PM</string>
 
-
-
-
-
-
-
+    <string name="error_place_not_found">Place not found</string>
 </resources>

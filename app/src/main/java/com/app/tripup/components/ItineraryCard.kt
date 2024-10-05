@@ -1,8 +1,5 @@
 package com.app.tripup.components
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -12,7 +9,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -22,7 +18,7 @@ import androidx.compose.material3.Card
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.tooling.preview.Preview
 import com.app.tripup.R
-import com.app.tripup.ui.theme.MyApplicationTheme
+import com.app.tripup.presentation.ui.theme.MyApplicationTheme
 
 @Composable
 fun ItineraryCard(
