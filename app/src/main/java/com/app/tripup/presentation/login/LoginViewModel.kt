@@ -81,6 +81,17 @@ class LoginViewModel(
             }
         }
     }
+
+    fun onLogout(){
+        viewModelScope.launch {
+            _loginState.update {
+                it.copy(
+                    loginSuccess = false
+                )
+            }
+        }
+    }
+
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory{
             initializer {

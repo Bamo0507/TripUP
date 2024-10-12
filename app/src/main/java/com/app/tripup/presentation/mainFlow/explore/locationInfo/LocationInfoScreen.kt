@@ -129,6 +129,8 @@ fun LocationInfoScreen(
                     }
 
                     // Círculo con el corazón en el extremo inferior
+                    //SE EVALUARÁ SU INCORPORACIÓN
+                    /*
                     IconButton(
                         onClick = {
                             isFavorite = !isFavorite
@@ -155,7 +157,11 @@ fun LocationInfoScreen(
                             modifier = Modifier.size(32.dp)
                         )
                     }
+
+                     */
+
                 }
+
 
                 // Nombre del lugar
                 Text(

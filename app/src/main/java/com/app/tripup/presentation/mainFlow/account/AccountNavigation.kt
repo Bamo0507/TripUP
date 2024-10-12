@@ -2,6 +2,8 @@ package com.app.tripup.presentation.mainFlow.account
 
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelStoreOwner
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
@@ -21,19 +23,22 @@ fun NavGraphBuilder.accountGraph(
 ){
     navigation<AccountNavGraph>(
         startDestination = AccountDestination
-    ){
-        //Lógica para logout pasada
-        //PUEDE QUE TOQUE AGREGAR MÁS COSAS ACÁ
+    ) {
         accountScreen(
             onLogoutClick = {
-                navController.navigate(LoginDestination) {
+                // Crear la instancia de LoginViewModel usando la Factory
+                val loginViewModel: LoginViewModel = ViewModelProvider(navController.context as ViewModelStoreOwner, LoginViewModel.Factory)
+                    .get(LoginViewModel::class.java)
+
+                // Llamar al método de logout en LoginViewModel
+                loginViewModel.onLogout()
+
+                // Navegar a la pantalla de Login y vaciar el backstack
+                navController.navigate(MainExploreDestination) { //LOGOUT DE MOMENTO NO ES FUNCIONAL TENGO QUE VER QUÉ ONDA
+                    //MANDAR A EXPLORE DE MOMENTO
                     popUpTo(0)
                 }
             }
         )
-        //AQUÍ ABAJO VA LA PANTALLA DE FAVORITOS SU NAVIGATION
-
-
-
     }
 }

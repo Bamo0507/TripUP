@@ -107,6 +107,7 @@ fun AccountScreen(onLogoutClick: () -> Unit, modifier: Modifier = Modifier, user
                     .padding(20.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
+                /*
                 AccountOption(
                     icon = Icons.Default.Favorite,
                     label = stringResource(id = R.string.your_favorites),
@@ -114,7 +115,7 @@ fun AccountScreen(onLogoutClick: () -> Unit, modifier: Modifier = Modifier, user
                 )
                 //EN DEBATE DE SI SE AGREGARÁ
                 // Spacer(modifier = Modifier.height(16.dp))
-                /*
+
                 AccountOption(
                     icon = Icons.Default.Send,
                     label = stringResource(id = R.string.past_trips),
