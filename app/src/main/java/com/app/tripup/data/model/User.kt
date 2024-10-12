@@ -5,5 +5,5 @@ data class User(
     val name: String,
     val email: String,
     val favoritePlaces: List<Place> = emptyList(), // Lugares guardados como favoritos
-    val pastItineraries: List<Itinerary> = emptyList() // Historial de itinerarios del usuario
+    val itineraries: List<Itinerary> = emptyList() // Itinerarios guardados por el usuario
 )

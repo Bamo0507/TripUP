@@ -31,13 +31,9 @@ fun AppNavigation(
                 )
             }
         )
-        //Aquí debo manejar el onlogoutClick más adelante
+        //MANEJAR LÓGICA DEL STATE PARA POR SI YA ESTÁ LOGGED IN
         mainNavigationGraph(
-            onLogoutClick = {
-                navController.navigate(LoginDestination){
-                    popUpTo(0) //NO ESTOY SEGURO SI YA CON BASE DE DATOS ES IGUAL
-                }
-            }
+
         )
     }
 }

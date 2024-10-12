@@ -8,6 +8,7 @@ import androidx.compose.material.icons.outlined.Commute
 import androidx.compose.material.icons.outlined.Explore
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.app.tripup.presentation.mainFlow.account.accountPage.AccountDestination
 import com.app.tripup.presentation.mainFlow.explore.exploreMain.MainExploreDestination
 
 data class NavItem(
@@ -36,12 +37,13 @@ val navigationItems = listOf(
         title = "Account",
         selectedIcon = Icons.Filled.Person,
         unselectedIcon = Icons.Outlined.Person,
-        destination = "account" //REEMPLAZAR CON EL SERIALIZABLE OBJECT CUANDO SE TENGA
+        destination = AccountDestination //REEMPLAZAR CON EL SERIALIZABLE OBJECT CUANDO SE TENGA
     )
 
 )
 
 val topLevelDestinations = listOf(
     MainExploreDestination::class,
-    //Aquí se colocarán las pantallas conforme se tengan
+    //FALTA ITINERAY
+    AccountDestination::class
 )

@@ -41,15 +41,14 @@ import com.app.tripup.presentation.navigation.BottomNavigationBar
 import com.app.tripup.presentation.ui.theme.MyApplicationTheme
 
 @Composable
-fun AccountScreen(modifier: Modifier = Modifier, userName: String) {
-    Scaffold(
-        bottomBar = {
-            BottomNavigationBar(
-                selectedItem = 2, // Índice de Account
-                onItemSelected = { /* Manejar selección */ }
-            )
-        }
-    ) { innerPadding ->
+fun AccountRoute(onLogoutClick: () -> Unit){
+    AccountScreen(onLogoutClick = onLogoutClick)
+}
+
+
+@Composable
+fun AccountScreen(onLogoutClick: () -> Unit, modifier: Modifier = Modifier, userName: String = "Usuario 1") {
+    Scaffold() { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -127,7 +126,11 @@ fun AccountScreen(modifier: Modifier = Modifier, userName: String) {
                 AccountOption(
                     icon = Icons.Default.ExitToApp,
                     label = stringResource(id = R.string.logout),
-                    iconTint = MaterialTheme.colorScheme.primary
+                    iconTint = MaterialTheme.colorScheme.primary,
+                    navAction = {
+                        onLogoutClick()
+                    }
+
                 )
             }
         }
@@ -136,12 +139,14 @@ fun AccountScreen(modifier: Modifier = Modifier, userName: String) {
 
 
 @Composable
-fun AccountOption(icon: ImageVector, label: String, iconTint: androidx.compose.ui.graphics.Color) {
+fun AccountOption(icon: ImageVector, label: String, iconTint: Color, navAction: ()-> Unit = {}) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { /* Acciones para cada opción */ }
+            .clickable {
+                navAction()
+            }
             .padding(horizontal = 32.dp, vertical = 16.dp)
     ) {
         Icon(
@@ -166,7 +171,7 @@ fun AccountOption(icon: ImageVector, label: String, iconTint: androidx.compose.u
 @Composable
 fun AccountScreenPreview() {
     MyApplicationTheme {
-        AccountScreen(modifier = Modifier.fillMaxSize(), "Usuario 1")
+        AccountScreen(modifier = Modifier.fillMaxSize(), userName = "Usuario 1", onLogoutClick = {})
     }
 }
 
@@ -174,7 +179,7 @@ fun AccountScreenPreview() {
 @Composable
 fun AccountScreenPreviewDark() {
     MyApplicationTheme {
-        AccountScreen(modifier = Modifier.fillMaxSize(), "Usuario 1")
+        AccountScreen(modifier = Modifier.fillMaxSize(), userName = "Usuario 1", onLogoutClick = {})
     }
 }
 

@@ -110,11 +110,11 @@ fun ExploreSpecificScreen(
                                     modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp)
                                 )
                                 LazyRow(
-                                    modifier = Modifier.padding(horizontal = 16.dp),
+                                    contentPadding = PaddingValues(horizontal = 16.dp),
                                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                                 ) {
                                     items(placeList) { place ->
-                                        com.app.tripup.presentation.mainFlow.explore.exploreMain.PlaceCard(
+                                        PlaceCard(
                                             place,
                                             onClick = { onPlaceClick(place.id) },
                                             modifier = Modifier.width(200.dp)

@@ -102,8 +102,8 @@ fun ExploreScreen(
                             modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp)
                         )
                         LazyRow(
-                            modifier = Modifier.padding(horizontal = 16.dp),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            contentPadding = PaddingValues(horizontal = 16.dp)
                         ) {
                             items(placeList) { place ->
                                 PlaceCard(
@@ -113,6 +113,7 @@ fun ExploreScreen(
                                 )
                             }
                         }
+
                     }
                 }
             }
