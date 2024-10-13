@@ -26,12 +26,14 @@ import com.app.tripup.presentation.mainFlow.account.accountGraph
 import com.app.tripup.presentation.mainFlow.account.accountPage.accountScreen
 import com.app.tripup.presentation.mainFlow.explore.ExploreNavGraph
 import com.app.tripup.presentation.mainFlow.explore.exploreGraph
+import com.app.tripup.presentation.mainFlow.itinerary.itineraryGraph
 import com.app.tripup.presentation.navigation.BottomNavBar
 
 
 @Composable
 fun MainFlowScreen(
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
+    //db: ItineraryDb
 ){
     var bottomBarVisible by rememberSaveable { mutableStateOf(false) }
 
@@ -78,6 +80,7 @@ fun MainFlowScreen(
             exploreGraph(navController)
             //Aquí se colocarán las pantallas conforme se tengan
             accountGraph(navController)
+            itineraryGraph(navController)
 
         }
 

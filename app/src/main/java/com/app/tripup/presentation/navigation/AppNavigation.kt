@@ -14,7 +14,7 @@ import com.app.tripup.presentation.mainFlow.navigateToMainGraph
 @Composable
 fun AppNavigation(
     modifier: Modifier = Modifier,
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
 ){
     NavHost(
         navController = navController,

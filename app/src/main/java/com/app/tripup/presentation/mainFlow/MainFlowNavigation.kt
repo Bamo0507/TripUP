@@ -14,11 +14,12 @@ fun NavController.navigateToMainGraph(navOptions: NavOptions? = null){
     this.navigate(MainNavigationGraph, navOptions)
 }
 
-fun NavGraphBuilder.mainNavigationGraph(){
+fun NavGraphBuilder.mainNavigationGraph(
+){
     composable<MainNavigationGraph> {
         val nestedNavController = rememberNavController()
         MainFlowScreen(
-            navController = nestedNavController
+            navController = nestedNavController,
         )
     }
 }

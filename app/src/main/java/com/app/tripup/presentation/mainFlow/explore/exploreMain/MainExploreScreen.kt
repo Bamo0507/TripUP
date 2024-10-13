@@ -24,7 +24,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.app.tripup.R
-import com.app.tripup.presentation.navigation.BottomNavigationBar // Importa el BottomNavigationBar desde el paquete components
 import com.app.tripup.data.model.Place
 import com.app.tripup.data.model.PlaceCategory
 import com.app.tripup.data.source.PlaceDb

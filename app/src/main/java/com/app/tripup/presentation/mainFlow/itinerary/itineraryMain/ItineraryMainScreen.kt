@@ -5,6 +5,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -23,17 +24,34 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.app.tripup.R
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.app.tripup.presentation.ui.theme.MyApplicationTheme
+
+@Composable
+fun ItineraryMainRoute(
+    viewModel: ItineraryMainViewModel = viewModel(),
+    onItemSelected: (Int) -> Unit,
+    onEditClick: () -> Unit
+) {
+
+    LaunchedEffect(Unit) {
+        viewModel.getListItineraries()
+    }
+
+    JourneyListScreen(viewModel = viewModel, onItemSelected = onItemSelected, onEditClick = onEditClick)
+}
 
 
 @Composable
 fun JourneyListScreen(
-    selectedItem: Int,
+    viewModel: ItineraryMainViewModel,
     onItemSelected: (Int) -> Unit,
-    onBackClick: () -> Unit = {},
     onEditClick: () -> Unit = {}
 ) {
+    val state by viewModel.uiState.collectAsState()
+
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
@@ -43,9 +61,6 @@ fun JourneyListScreen(
             ) {
                 Icon(Icons.Filled.Edit, contentDescription = "Edit", tint = Color.White)
             }
-        },
-        bottomBar = {
-            BottomNavigationBar(selectedItem = selectedItem, onItemSelected = onItemSelected)
         }
     ) { innerPadding ->
         Column(
@@ -55,15 +70,28 @@ fun JourneyListScreen(
                 .padding(16.dp)
         ) {
             Spacer(modifier = Modifier.height(20.dp))
-            ItineraryCardWithColorBox(
-                title = stringResource(id = R.string.itinerary_title_example), //Más adelante se agregará la función adecuada
-                //Se tendrá una carta por cada una de las cards que el usuario tenga, es decir, por cada itinerario
-                isSelected = false,
-                onCardClick = { /* Acción al hacer clic en la tarjeta */ }
-            )
+
+            if (state.isLoading) {
+                CircularProgressIndicator()
+            } else if (state.data.isEmpty()) {
+                Text(text = "No itineraries available.")
+            } else {
+                LazyColumn {
+                    // Usamos el tamaño de la lista de itinerarios
+                    items(state.data.size) { index ->
+                        val itinerary = state.data[index] // Obtener el itinerario en el índice correspondiente
+                        ItineraryCardWithColorBox(
+                            title = itinerary.name, // Acceder a 'name' correctamente
+                            isSelected = false,
+                            onCardClick = { onItemSelected(itinerary.id) } // Acceder a 'id' correctamente
+                        )
+                    }
+                }
+            }
         }
     }
 }
+
 
 
 @Composable
@@ -131,92 +159,4 @@ fun ItineraryCardWithColorBox(
     }
 }
 
-
-@Composable
-fun BottomNavigationBar(
-    selectedItem: Int,
-    onItemSelected: (Int) -> Unit
-) {
-    val items = listOf(
-        NavigationItem.Explore,
-        NavigationItem.Itinerary,
-        NavigationItem.Account
-    )
-
-    NavigationBar(
-        containerColor = MaterialTheme.colorScheme.surface,
-        contentColor = MaterialTheme.colorScheme.onSurface
-    ) {
-        items.forEachIndexed { index, item ->
-            val isSelected = selectedItem == index
-
-            NavigationBarItem(
-                selected = isSelected,
-                onClick = { onItemSelected(index) },
-                icon = {
-                    if (isSelected) {
-                        Card(
-                            shape = RoundedCornerShape(24.dp),
-                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.onSecondaryContainer),
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.inversePrimary
-                            ),
-                            modifier = Modifier
-                                .size(width = 80.dp, height = 40.dp)
-                        ) {
-                            Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()) {
-                                Icon(
-                                    imageVector = item.icon,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.onSurface,
-                                    modifier = Modifier.padding(8.dp)
-                                )
-                            }
-                        }
-                    } else {
-                        Icon(
-                            imageVector = item.icon,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                },
-                label = {
-                    Text(
-                        text = stringResource(id = item.title),
-                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
-                    )
-                },
-                alwaysShowLabel = true,
-                colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = MaterialTheme.colorScheme.onSurface,
-                    unselectedIconColor = MaterialTheme.colorScheme.onSurface,
-                    indicatorColor = Color.Transparent
-                )
-            )
-        }
-    }
-}
-
-sealed class NavigationItem(val icon: ImageVector, val title: Int) {
-    object Explore : NavigationItem(Icons.Default.Explore, R.string.nav_explore)
-    object Itinerary : NavigationItem(Icons.Default.Commute, R.string.nav_itinerary)
-    object Account : NavigationItem(Icons.Default.Person, R.string.nav_account)
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewJourneyListScreen() {
-    MyApplicationTheme {
-        JourneyListScreen(selectedItem = 1, onItemSelected = {})
-    }
-}
-
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-fun PreviewJourneyListScreenDarkMode() {
-    MyApplicationTheme {
-        JourneyListScreen(selectedItem = 1, onItemSelected = {})
-    }
-}
 
