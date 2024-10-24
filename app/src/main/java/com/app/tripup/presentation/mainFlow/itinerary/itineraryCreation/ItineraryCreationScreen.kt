@@ -1,205 +1,170 @@
+// ItineraryCreationScreen.kt
 package com.app.tripup.presentation.mainFlow.itinerary.itineraryCreation
-import android.content.res.Configuration
+
+import android.app.DatePickerDialog
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.app.tripup.R
-import com.app.tripup.presentation.ui.theme.MyApplicationTheme
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.app.tripup.data.local.DatabaseModule
+import com.app.tripup.data.repository.ItineraryRepository
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @Composable
-fun CreateJourneyScreen(
-    title: String = "",
-    startTime: String = "",
-    onBackClick: () -> Unit = {}
+fun ItineraryCreationRoute(
+    onItineraryCreated: (Long) -> Unit,
+    onBackClick: () -> Unit
 ) {
-    var titleState by remember { mutableStateOf(title) }
-    var startTimeState by remember { mutableStateOf(startTime) }
+    val context = LocalContext.current
+    val itineraryRepository = ItineraryRepository(
+        DatabaseModule.getDatabase(context).itineraryDao()
+    )
+    val viewModel: ItineraryCreationViewModel = viewModel(
+        factory = ItineraryCreationViewModelFactory(itineraryRepository)
+    )
+    val uiState by viewModel.uiState.collectAsState()
 
+    if (uiState.isSaved) {
+        uiState.itineraryId?.let { id ->
+            onItineraryCreated(id)
+        }
+    }
+
+
+    ItineraryCreationScreen(
+        title = uiState.title,
+        startDate = uiState.startDate,
+        endDate = uiState.endDate,
+        onTitleChanged = viewModel::onTitleChanged,
+        onStartDateChanged = viewModel::onStartDateChanged,
+        onEndDateChanged = viewModel::onEndDateChanged,
+        onSaveItinerary = viewModel::onSaveItinerary,
+        isFormComplete = uiState.isFormComplete,
+        onBackClick = onBackClick
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ItineraryCreationScreen(
+    title: String,
+    startDate: String,
+    endDate: String,
+    onTitleChanged: (String) -> Unit,
+    onStartDateChanged: (String) -> Unit,
+    onEndDateChanged: (String) -> Unit,
+    onSaveItinerary: () -> Unit,
+    isFormComplete: Boolean,
+    onBackClick: () -> Unit
+) {
     Scaffold(
         topBar = {
-            JourneyTopAppBar(onBackClick = onBackClick)
+            TopAppBar(
+                title = { Text("Create Itinerary") },
+                navigationIcon = {
+                    IconButton(onClick = onBackClick) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                    }
+                }
+            )
         }
-    ) { innerPadding ->
+    ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
+                .padding(paddingValues)
                 .padding(16.dp)
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-            ) {
-                // Campo de texto Itinerary Title
-                JourneyTextField(
-                    value = titleState,
-                    label = "Itinerary Title",
-                    placeholder = "Input",
-                    onValueChange = { titleState = it }
-                )
-
-                Text(
-                    text = stringResource(id = R.string.memorable_name),
-                    fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 16.dp)
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-
-                JourneyTextField(
-                    value = startTimeState,
-                    label = stringResource(id = R.string.date_interval),
-                    placeholder = "Input",
-                    onValueChange = { startTimeState = it }
-                )
-            }
-
-            // Botón  de "Complete"
-            JourneyCompleteButton(
-                isFormComplete = titleState.isNotEmpty() && startTimeState.isNotEmpty(),
-                modifier = Modifier.align(Alignment.End)
+            OutlinedTextField(
+                value = title,
+                onValueChange = onTitleChanged,
+                label = { Text("Title") },
+                modifier = Modifier.fillMaxWidth()
             )
+            Spacer(modifier = Modifier.height(16.dp))
+            DatePickerField(
+                label = "Start Date",
+                date = startDate,
+                onDateSelected = onStartDateChanged
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            DatePickerField(
+                label = "End Date",
+                date = endDate,
+                onDateSelected = onEndDateChanged
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(
+                onClick = onSaveItinerary,
+                enabled = isFormComplete,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Complete")
+            }
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun JourneyTopAppBar(onBackClick: () -> Unit) {
-    TopAppBar(
-        title = { Text(text = stringResource(id = R.string.create_journey)) },
-        navigationIcon = {
-            IconButton(onClick = onBackClick) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-            }
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-            titleContentColor = MaterialTheme.colorScheme.onSurface,
-            navigationIconContentColor = MaterialTheme.colorScheme.onSurface
-        )
-    )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun JourneyTextField(
-    value: String,
+fun DatePickerField(
     label: String,
-    placeholder: String,
-    onValueChange: (String) -> Unit
+    date: String,
+    onDateSelected: (String) -> Unit
 ) {
+    val context = LocalContext.current
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+    val dateState = remember { mutableStateOf(date) }
+
     OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
+        value = dateState.value,
+        onValueChange = {},
         label = { Text(label) },
-        placeholder = { Text(placeholder) },
-        modifier = Modifier.fillMaxWidth(),
         trailingIcon = {
-            if (value.isNotEmpty()) {
-                IconButton(onClick = { onValueChange("") }) {
-                    Icon(Icons.Filled.Close, contentDescription = "Clear text")
+            IconButton(onClick = {
+                val initialDate = if (dateState.value.isNotEmpty()) {
+                    LocalDate.parse(dateState.value, formatter)
+                } else {
+                    LocalDate.now()
                 }
+                showDatePickerDialog(
+                    context = context,
+                    initialDate = initialDate,
+                    onDateSelected = { selectedDate ->
+                        val formattedDate = selectedDate.format(formatter)
+                        dateState.value = formattedDate
+                        onDateSelected(formattedDate)
+                    }
+                )
+            }) {
+                Icon(Icons.Filled.CalendarToday, contentDescription = "Select Date")
             }
         },
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = MaterialTheme.colorScheme.primary,
-            unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            cursorColor = MaterialTheme.colorScheme.primary
-        ),
-        shape = MaterialTheme.shapes.medium
+        readOnly = true,
+        modifier = Modifier.fillMaxWidth()
     )
 }
 
-@Composable
-fun JourneyCompleteButton(isFormComplete: Boolean, modifier: Modifier = Modifier) {
-    Button(
-        onClick = { /* Acción del botón */ },
-        modifier = modifier
-            .padding(16.dp)
-            .width(140.dp)
-            .height(48.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = if (isFormComplete) {
-                MaterialTheme.colorScheme.primary // Si el formulario está completo
-            } else {
-                MaterialTheme.colorScheme.tertiaryContainer // Si el formulario no está completo
-            }
-        ),
-        shape = CircleShape
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            Icon(Icons.Filled.Check, contentDescription = "Check icon",
-                tint = if (isFormComplete) MaterialTheme.colorScheme.onPrimary
-            else MaterialTheme.colorScheme.onTertiaryContainer)
-            Spacer(modifier = Modifier.width(7.dp))
-            Text(text = stringResource(id = R.string.complete_button),
-                color = if (isFormComplete) MaterialTheme.colorScheme.onPrimary
-                else MaterialTheme.colorScheme.onTertiaryContainer)
-        }
-    }
+fun showDatePickerDialog(
+    context: android.content.Context,
+    initialDate: LocalDate,
+    onDateSelected: (LocalDate) -> Unit
+) {
+    val datePickerDialog = DatePickerDialog(
+        context,
+        { _, year, month, dayOfMonth ->
+            val selectedDate = LocalDate.of(year, month + 1, dayOfMonth)
+            onDateSelected(selectedDate)
+        },
+        initialDate.year,
+        initialDate.monthValue - 1,
+        initialDate.dayOfMonth
+    )
+    datePickerDialog.show()
 }
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewBeforeFilled() {
-    MyApplicationTheme {
-        CreateJourneyScreen(
-            title = "",
-            startTime = ""
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewAfterFilled() {
-    MyApplicationTheme {
-        CreateJourneyScreen(
-            title = "Family Trip",
-            startTime = "08/16/2024 - 08/27/2024"
-        )
-    }
-}
-
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-fun PreviewBeforeFilledDark() {
-    MyApplicationTheme {
-        CreateJourneyScreen(
-            title = "",
-            startTime = ""
-        )
-    }
-}
-
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-fun PreviewAfterFilledDark() {
-    MyApplicationTheme {
-        CreateJourneyScreen(
-            title = "Family Trip",
-            startTime = "08/16/2024 - 08/27/2024"
-        )
-    }
-}
-

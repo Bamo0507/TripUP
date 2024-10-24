@@ -24,6 +24,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,17 +38,30 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.app.tripup.R
-import com.app.tripup.presentation.navigation.BottomNavigationBar
+import com.app.tripup.domain.UserPreferences
 import com.app.tripup.presentation.ui.theme.MyApplicationTheme
+import kotlinx.coroutines.launch
 
 @Composable
-fun AccountRoute(onLogoutClick: () -> Unit){
-    AccountScreen(onLogoutClick = onLogoutClick)
+fun AccountRoute(
+    onLogoutClick: () -> Unit,
+    userPreferences: UserPreferences
+) {
+    AccountScreen(onLogoutClick = onLogoutClick, userPreferences = userPreferences)
 }
 
 
 @Composable
-fun AccountScreen(onLogoutClick: () -> Unit, modifier: Modifier = Modifier, userName: String = "Usuario 1") {
+fun AccountScreen(
+    onLogoutClick: () -> Unit,
+    userPreferences: UserPreferences,
+    modifier: Modifier = Modifier,
+    userName: String = "Usuario"
+) {
+
+    val coroutineScope = rememberCoroutineScope()
+
+
     Scaffold() { innerPadding ->
         Column(
             modifier = Modifier
@@ -124,14 +138,17 @@ fun AccountScreen(onLogoutClick: () -> Unit, modifier: Modifier = Modifier, user
                 */
 
                 Spacer(modifier = Modifier.height(16.dp))
+
                 AccountOption(
                     icon = Icons.Default.ExitToApp,
                     label = stringResource(id = R.string.logout),
                     iconTint = MaterialTheme.colorScheme.primary,
                     navAction = {
-                        onLogoutClick()
+                        coroutineScope.launch {
+                            userPreferences.setLoggedIn(false)
+                            onLogoutClick()
+                        }
                     }
-
                 )
             }
         }
@@ -163,24 +180,6 @@ fun AccountOption(icon: ImageVector, label: String, iconTint: Color, navAction: 
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface
         )
-    }
-}
-
-
-
-@Preview(showBackground = true)
-@Composable
-fun AccountScreenPreview() {
-    MyApplicationTheme {
-        AccountScreen(modifier = Modifier.fillMaxSize(), userName = "Usuario 1", onLogoutClick = {})
-    }
-}
-
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-fun AccountScreenPreviewDark() {
-    MyApplicationTheme {
-        AccountScreen(modifier = Modifier.fillMaxSize(), userName = "Usuario 1", onLogoutClick = {})
     }
 }
 

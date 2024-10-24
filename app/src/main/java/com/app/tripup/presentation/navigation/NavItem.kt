@@ -10,6 +10,7 @@ import androidx.compose.material.icons.outlined.Person
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.app.tripup.presentation.mainFlow.account.accountPage.AccountDestination
 import com.app.tripup.presentation.mainFlow.explore.exploreMain.MainExploreDestination
+import com.app.tripup.presentation.mainFlow.itinerary.itineraryMain.ItineraryMainDestination
 
 data class NavItem(
     val title: String,
@@ -30,7 +31,7 @@ val navigationItems = listOf(
         title = "Itinerary",
         selectedIcon = Icons.Filled.Commute,
         unselectedIcon = Icons.Outlined.Commute,
-        destination = "itinerary" //REEMPLAZAR CON EL SERIALIZABLE OBJECT CUANDO SE TENGA
+        destination = ItineraryMainDestination//REEMPLAZAR CON EL SERIALIZABLE OBJECT CUANDO SE TENGA
     ),
 
     NavItem(
@@ -44,6 +45,6 @@ val navigationItems = listOf(
 
 val topLevelDestinations = listOf(
     MainExploreDestination::class,
-    //FALTA ITINERAY
+    ItineraryMainDestination::class,
     AccountDestination::class
 )

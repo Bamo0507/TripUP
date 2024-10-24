@@ -1,3 +1,4 @@
+// MainActivity.kt
 package com.app.tripup
 
 import android.os.Bundle
@@ -7,14 +8,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
-import com.app.tripup.presentation.login.LoginScreen
-import com.app.tripup.presentation.login.LoginViewModel
-import com.app.tripup.presentation.ui.theme.MyApplicationTheme
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
+import com.app.tripup.data.DataStoreUserPreferences
 import com.app.tripup.presentation.navigation.AppNavigation
+import com.app.tripup.presentation.ui.theme.MyApplicationTheme
 
 class MainActivity : ComponentActivity() {
+
+    private val userPreferences by lazy {
+        DataStoreUserPreferences(applicationContext)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -22,8 +26,11 @@ class MainActivity : ComponentActivity() {
             MyApplicationTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     AppNavigation(
-                        modifier = Modifier.padding(innerPadding).fillMaxSize(),
-                        navController = navController
+                        modifier = Modifier
+                            .padding(innerPadding)
+                            .fillMaxSize(),
+                        navController = navController,
+                        userPreferences = userPreferences
                     )
                 }
             }

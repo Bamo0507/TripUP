@@ -22,26 +22,41 @@ import androidx.compose.ui.unit.dp
 import com.app.tripup.R
 import com.app.tripup.presentation.ui.theme.MyApplicationTheme
 import android.content.res.Configuration
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.app.tripup.domain.UserPreferences
 import com.app.tripup.presentation.LoadingScreen
+import com.app.tripup.presentation.login.LoginViewModel.Companion.Factory
 
 @Composable
-fun LoginRoute(onLoginSuccess: () -> Unit,
-               viewModel: LoginViewModel = androidx.lifecycle.viewmodel.compose.viewModel(factory = LoginViewModel.Factory)){
+fun LoginRoute(
+    onLoginSuccess: () -> Unit,
+    userPreferences: UserPreferences
+) {
+    // Crear una instancia del ViewModel utilizando el Factory
+    val viewModel: LoginViewModel = viewModel(
+        factory = Factory(
+            loginRepository = LocalLoginRepository(),
+            userPreferences = userPreferences
+        )
+    )
+
+    // Escuchar cambios de estado del login
     val loginState by viewModel.loginState.collectAsState()
 
-    // Si el login es exitoso, llama a onLoginSuccess para navegar
+    // Si el login es exitoso, ejecutamos la navegación correspondiente
     if (loginState.loginSuccess) {
         onLoginSuccess()
     }
 
-    // Mostrar la pantalla de inicio de sesión
+    // Pasar el ViewModel a la pantalla
     LoginScreen(viewModel = viewModel)
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
-    viewModel: LoginViewModel = androidx.lifecycle.viewmodel.compose.viewModel(factory = LoginViewModel.Factory),
+    viewModel: LoginViewModel,
     modifier: Modifier = Modifier
 ) {
     val loginState by viewModel.loginState.collectAsState()
@@ -196,59 +211,3 @@ fun LoginScreen(
 }
 
 
-@Preview(showBackground = true)
-@Composable
-fun LoginScreenPreview() {
-    MyApplicationTheme {
-        Surface(modifier = Modifier.fillMaxSize()) {
-            // Crea un ViewModel temporal con estado inicial
-            val viewModel = LoginViewModel(LocalLoginRepository())
-            viewModel.onLoginEvent(LoginEvent.EmailChanged("hoola"))
-            LoginScreen(viewModel = viewModel)
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun LoginScreenPreviewWithError() {
-    MyApplicationTheme {
-        Surface(modifier = Modifier.fillMaxSize()) {
-            // Crea un ViewModel temporal con un estado que simula un error
-            val viewModel = LoginViewModel(LocalLoginRepository())
-            viewModel.onLoginEvent(LoginEvent.EmailChanged("test@tripup.com"))
-            viewModel.onLoginEvent(LoginEvent.PasswordChanged(""))
-            viewModel.onLoginEvent(LoginEvent.LoginClick)
-
-            LoginScreen(viewModel = viewModel)
-        }
-    }
-}
-
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-fun LoginScreenPreviewDarkMode() {
-    MyApplicationTheme(darkTheme = true) {
-        Surface(modifier = Modifier.fillMaxSize()) {
-            // Crea un ViewModel temporal sin error
-            val viewModel = LoginViewModel(LocalLoginRepository())
-            LoginScreen(viewModel = viewModel)
-        }
-    }
-}
-
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-fun LoginScreenPreviewDarkModewithError() {
-    MyApplicationTheme(darkTheme = true) {
-        Surface(modifier = Modifier.fillMaxSize()) {
-            // Crea un ViewModel temporal con un estado que simula un error
-            val viewModel = LoginViewModel(LocalLoginRepository())
-            viewModel.onLoginEvent(LoginEvent.EmailChanged("test@tripup.com"))
-            viewModel.onLoginEvent(LoginEvent.PasswordChanged(""))
-            viewModel.onLoginEvent(LoginEvent.LoginClick)
-
-            LoginScreen(viewModel = viewModel)
-        }
-    }
-}

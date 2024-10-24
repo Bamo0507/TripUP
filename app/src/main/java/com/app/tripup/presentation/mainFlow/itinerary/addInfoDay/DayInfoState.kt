@@ -1,4 +1,11 @@
+// DayInfoState.kt
 package com.app.tripup.presentation.mainFlow.itinerary.addInfoDay
 
-class DayInfoState {
-}
+data class DayInfoState(
+    val activityName: String = "",
+    val startTime: String = "",
+    val endTime: String = "",
+    val isFormComplete: Boolean = false,
+    val isSaved: Boolean = false,
+    val errorMessage: String? = null
+)
