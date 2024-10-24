@@ -6,6 +6,5 @@ data class DayInfoState(
     val startTime: String = "",
     val endTime: String = "",
     val isFormComplete: Boolean = false,
-    val isSaved: Boolean = false,
     val errorMessage: String? = null
 )

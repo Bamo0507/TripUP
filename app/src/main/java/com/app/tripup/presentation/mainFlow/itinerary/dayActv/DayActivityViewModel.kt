@@ -10,37 +10,35 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class DayActivityViewModel(
-    private val activityRepository: ActivityRepository,
-    private val dayItineraryId: Int
+    private val activityRepository: ActivityRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(DayActivityState())
     val uiState: StateFlow<DayActivityState> = _uiState
 
-    init {
-        loadActivities()
-    }
-
-    private fun loadActivities() {
+    fun loadActivities(dayItineraryId: Int) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
             try {
                 val activities = activityRepository.getActivitiesForDay(dayItineraryId)
-                _uiState.value = _uiState.value.copy(activities = activities, isLoading = false)
+                _uiState.value = _uiState.value.copy(
+                    activities = activities,
+                    isLoading = false
+                )
             } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(errorMessage = e.message, isLoading = false)
+                _uiState.value = _uiState.value.copy(
+                    errorMessage = e.message,
+                    isLoading = false
+                )
             }
         }
     }
+}
 
-    companion object {
-        class Factory(
-            private val activityRepository: ActivityRepository,
-            private val dayItineraryId: Int
-        ) : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return DayActivityViewModel(activityRepository, dayItineraryId) as T
-            }
-        }
+class DayActivityViewModelFactory(
+    private val activityRepository: ActivityRepository
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        return DayActivityViewModel(activityRepository) as T
     }
 }

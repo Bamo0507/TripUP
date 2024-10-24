@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
 data object ItineraryCreationDestination
 
 fun NavGraphBuilder.itineraryCreationScreen(
-    onItineraryCreated: (Long) -> Unit,
+    onItineraryCreated: (Int) -> Unit,
     onBackClick: () -> Unit
 ) {
     composable<ItineraryCreationDestination> {

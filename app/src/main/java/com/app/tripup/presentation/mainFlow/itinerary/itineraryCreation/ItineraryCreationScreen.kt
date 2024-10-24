@@ -13,30 +13,36 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.app.tripup.data.local.DatabaseModule
+import com.app.tripup.data.repository.DayItineraryRepository
 import com.app.tripup.data.repository.ItineraryRepository
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 @Composable
 fun ItineraryCreationRoute(
-    onItineraryCreated: (Long) -> Unit,
+    onItineraryCreated: (Int) -> Unit,
     onBackClick: () -> Unit
 ) {
     val context = LocalContext.current
     val itineraryRepository = ItineraryRepository(
         DatabaseModule.getDatabase(context).itineraryDao()
     )
+    val dayItineraryRepository = DayItineraryRepository(
+        DatabaseModule.getDatabase(context).dayItineraryDao()
+    )
     val viewModel: ItineraryCreationViewModel = viewModel(
-        factory = ItineraryCreationViewModelFactory(itineraryRepository)
+        factory = ItineraryCreationViewModelFactory(itineraryRepository, dayItineraryRepository)
     )
     val uiState by viewModel.uiState.collectAsState()
 
-    if (uiState.isSaved) {
-        uiState.itineraryId?.let { id ->
-            onItineraryCreated(id)
+    // Handle navigation when the itinerary is saved
+    LaunchedEffect(uiState.isSaved) {
+        if (uiState.isSaved) {
+            uiState.itineraryId?.let { id ->
+                onItineraryCreated(id.toInt())
+            }
         }
     }
-
 
     ItineraryCreationScreen(
         title = uiState.title,
@@ -47,7 +53,7 @@ fun ItineraryCreationRoute(
         onEndDateChanged = viewModel::onEndDateChanged,
         onSaveItinerary = viewModel::onSaveItinerary,
         isFormComplete = uiState.isFormComplete,
-        onBackClick = onBackClick
+        onBackClick = onBackClick,
     )
 }
 
@@ -62,7 +68,7 @@ fun ItineraryCreationScreen(
     onEndDateChanged: (String) -> Unit,
     onSaveItinerary: () -> Unit,
     isFormComplete: Boolean,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
 ) {
     Scaffold(
         topBar = {

@@ -1,165 +1,175 @@
+// DayInfoScreen.kt
 package com.app.tripup.presentation.mainFlow.itinerary.addInfoDay
 
-import android.content.res.Configuration
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import android.app.TimePickerDialog
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.app.tripup.R
-import com.app.tripup.presentation.ui.theme.MyApplicationTheme
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.app.tripup.data.local.DatabaseModule
+import com.app.tripup.data.repository.ActivityRepository
+import java.util.Calendar
+import androidx.compose.material.icons.filled.AccessTime
 
 @Composable
-fun ActivityListScreen(
-    onBackClick: () -> Unit = {},
-    onAddClick: () -> Unit = {}
+fun DayInfoRoute(
+    dayItineraryId: Int,
+    itineraryTitle: String,
+    date: String,
+    onActivityCreated: () -> Unit,
+    onBackClick: () -> Unit
 ) {
-    Scaffold(
-        topBar = {
-            ActivityTopAppBar(onBackClick = onBackClick)
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = onAddClick,
-                shape = RoundedCornerShape(16.dp),
-                containerColor = MaterialTheme.colorScheme.primaryContainer
-            ) {
-                Icon(Icons.Filled.Add,
-                    contentDescription = "Add",
-                    tint = MaterialTheme.colorScheme.onPrimaryContainer)
-            }
-        }
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .padding(16.dp)
-        ) {
+    val context = LocalContext.current // Obtener contexto aquí
 
-            ItineraryCard(
-                title = stringResource(id = R.string.activity_name_example),
-                startTime = stringResource(id = R.string.start_time_example),
-                endTime = stringResource(id = R.string.end_time_example),
-                isSelected = false,
-                onCardClick = { /* Acción al hacer clic en la tarjeta */ }
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            ItineraryCard(
-                title = stringResource(id = R.string.activity_name_example_2),
-                startTime = stringResource(id = R.string.start_time_example_2),
-                endTime = stringResource(id = R.string.end_time_example_2),
-                isSelected = false,
-                onCardClick = { /* Acción al hacer clic en la tarjeta */ }
-            )
-        }
-    }
+    val activityRepository = ActivityRepository(
+        DatabaseModule.getDatabase(context).activityDao()
+    )
+    val viewModel: DayInfoViewModel = viewModel(
+        factory = DayInfoViewModelFactory(activityRepository)
+    )
+    val uiState by viewModel.uiState.collectAsState()
+
+    DayInfoScreen(
+        itineraryTitle = itineraryTitle,
+        date = date,
+        context = context,  // Pasar el contexto a la pantalla
+        activityName = uiState.activityName,
+        startTime = uiState.startTime,
+        endTime = uiState.endTime,
+        onActivityNameChanged = viewModel::onActivityNameChanged,
+        onStartTimeChanged = viewModel::onStartTimeChanged,
+        onEndTimeChanged = viewModel::onEndTimeChanged,
+        onSaveActivity = {
+            viewModel.onSaveActivity(dayItineraryId)
+            onActivityCreated()
+        },
+        isFormComplete = uiState.isFormComplete,
+        onBackClick = onBackClick
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ActivityTopAppBar(onBackClick: () -> Unit) {
-    TopAppBar(
-        //No se agrega a Strings ya que es algo variable que viene de pantalla anterior
-        title = { Text(text = stringResource(id = R.string.list_of_activities_title)) },
-        navigationIcon = {
-            IconButton(onClick = onBackClick) {
-                Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
-            }
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-            titleContentColor = MaterialTheme.colorScheme.onSurface,
-            navigationIconContentColor = MaterialTheme.colorScheme.onSurface
-        )
-    )
-}
-
-
-@Composable
-fun ItineraryCard(
-    modifier: Modifier = Modifier,
-    title: String,
+fun DayInfoScreen(
+    itineraryTitle: String,
+    date: String,
+    context: android.content.Context,  // Recibir el contexto como parámetro
+    activityName: String,
     startTime: String,
     endTime: String,
-    isSelected: Boolean = false,
-    onCardClick: () -> Unit
+    onActivityNameChanged: (String) -> Unit,
+    onStartTimeChanged: (String) -> Unit,
+    onEndTimeChanged: (String) -> Unit,
+    onSaveActivity: () -> Unit,
+    isFormComplete: Boolean,
+    onBackClick: () -> Unit
 ) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 12.dp, vertical = 8.dp)
-            .clickable { onCardClick() }
-            .shadow(24.dp, shape = RoundedCornerShape(16.dp)),
-        shape = RoundedCornerShape(16.dp),
-    ) {
-        val backgroundColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.inverseOnSurface
-        val textColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
-
-        Row(
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("$itineraryTitle / $date") },
+                navigationIcon = {
+                    IconButton(onClick = onBackClick) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                    }
+                }
+            )
+        }
+    ) { paddingValues ->
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .background(backgroundColor),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(16.dp)
         ) {
-            Column(modifier = Modifier.padding(16.dp)) {
+            OutlinedTextField(
+                value = activityName,
+                onValueChange = onActivityNameChanged,
+                label = { Text("Activity Name") },
+                trailingIcon = {
+                    if (activityName.isNotEmpty()) {
+                        IconButton(onClick = { onActivityNameChanged("") }) {
+                            Icon(Icons.Filled.Close, contentDescription = "Clear")
+                        }
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            )
 
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = textColor
-                )
-                Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-                Text(
-                    text = "$startTime - $endTime",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = textColor
-                )
+            // Start Time Field
+            OutlinedTextField(
+                value = startTime,
+                onValueChange = {},
+                label = { Text("Start Time") },
+                trailingIcon = {
+                    IconButton(onClick = {
+                        showTimePickerDialog(context) { time ->
+                            onStartTimeChanged(time)
+                        }
+                    }) {
+                        Icon(Icons.Default.AccessTime, contentDescription = "Select Start Time")
+                    }
+                },
+                readOnly = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // End Time Field (Usar endTime correctamente)
+            OutlinedTextField(
+                value = endTime,  // Cambiado a endTime
+                onValueChange = {},
+                label = { Text("End Time") },
+                trailingIcon = {
+                    IconButton(onClick = {
+                        showTimePickerDialog(context) { time ->
+                            onEndTimeChanged(time)  // Cambiado a onEndTimeChanged
+                        }
+                    }) {
+                        Icon(Icons.Default.AccessTime, contentDescription = "Select End Time")
+                    }
+                },
+                readOnly = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = onSaveActivity,
+                enabled = isFormComplete,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Save Activity")
             }
-            Spacer(modifier = Modifier.weight(1f))
-
-            SolidColorBox(color = MaterialTheme.colorScheme.primary)
         }
     }
 }
 
-@Composable
-fun SolidColorBox(color: Color) {
-    Box(
-        modifier = Modifier
-            .height(75.dp)
-            .width(75.dp)
-            .background(color = color, shape = RoundedCornerShape(16.dp))
+fun showTimePickerDialog(
+    context: android.content.Context,
+    onTimeSelected: (String) -> Unit
+) {
+    val calendar = Calendar.getInstance()
+    val timePickerDialog = TimePickerDialog(
+        context,
+        { _, hourOfDay, minute ->
+            val formattedTime = String.format("%02d:%02d", hourOfDay, minute)
+            onTimeSelected(formattedTime)
+        },
+        calendar.get(Calendar.HOUR_OF_DAY),
+        calendar.get(Calendar.MINUTE),
+        true
     )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewActivityListScreen() {
-    MyApplicationTheme {
-        ActivityListScreen()
-    }
-}
-
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-fun PreviewActivityListScreenDarkMode() {
-    MyApplicationTheme {
-        ActivityListScreen()
-    }
+    timePickerDialog.show()
 }

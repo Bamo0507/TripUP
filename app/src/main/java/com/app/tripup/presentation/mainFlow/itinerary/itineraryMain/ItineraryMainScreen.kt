@@ -76,6 +76,7 @@ fun ItineraryMainScreen(
         }
     }
 }
+
 @Composable
 fun ItineraryItem(
     itinerary: Itinerary,

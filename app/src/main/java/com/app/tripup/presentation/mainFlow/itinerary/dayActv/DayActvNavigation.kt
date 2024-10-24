@@ -1,27 +1,42 @@
-// DayActvNavigation.kt
+// DayActivityNavigation.kt
 package com.app.tripup.presentation.mainFlow.itinerary.dayActv
 
+import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
+import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
 
-/*
 @Serializable
-data class DayActivityDestination(val dayItineraryId: Int)
+data class DayActivityDestination(
+    val dayItineraryId: Int,
+    val itineraryTitle: String,
+    val date: String
+)
+
+fun NavController.navigateToDayActivityScreen(
+    destination: DayActivityDestination,
+    navOptions: NavOptions? = null
+) {
+    this.navigate(
+        destination,
+        navOptions
+    )
+}
 
 fun NavGraphBuilder.dayActivityScreen(
-    onAddActivityClick: (Int) -> Unit,
+    onAddActivityClick: (Int, String, String) -> Unit,
     onBackClick: () -> Unit
 ) {
     composable<DayActivityDestination> { backStackEntry ->
-        val dayItineraryId = backStackEntry.arguments?.getInt("dayItineraryId") ?: return@composable
+        val destination: DayActivityDestination = backStackEntry.toRoute()
         DayActivityRoute(
-            dayItineraryId = dayItineraryId,
+            dayItineraryId = destination.dayItineraryId,
+            itineraryTitle = destination.itineraryTitle,
+            date = destination.date,
             onAddActivityClick = onAddActivityClick,
             onBackClick = onBackClick
         )
     }
 }
-
-
- */

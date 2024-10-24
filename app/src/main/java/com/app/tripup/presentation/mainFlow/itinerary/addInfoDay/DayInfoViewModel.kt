@@ -11,8 +11,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class DayInfoViewModel(
-    private val activityRepository: ActivityRepository,
-    private val dayItineraryId: Int
+    private val activityRepository: ActivityRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(DayInfoState())
@@ -35,11 +34,13 @@ class DayInfoViewModel(
 
     private fun checkFormCompletion() {
         val state = _uiState.value
-        val isComplete = state.activityName.isNotEmpty() && state.startTime.isNotEmpty() && state.endTime.isNotEmpty()
+        val isComplete = state.activityName.isNotEmpty() &&
+                state.startTime.isNotEmpty() &&
+                state.endTime.isNotEmpty()
         _uiState.value = state.copy(isFormComplete = isComplete)
     }
 
-    fun onSaveActivity() {
+    fun onSaveActivity(dayItineraryId: Int) {
         viewModelScope.launch {
             val state = _uiState.value
             try {
@@ -50,21 +51,17 @@ class DayInfoViewModel(
                     endTime = state.endTime
                 )
                 activityRepository.insertActivity(activity)
-                _uiState.value = state.copy(isSaved = true)
             } catch (e: Exception) {
                 _uiState.value = state.copy(errorMessage = e.message)
             }
         }
     }
+}
 
-    companion object {
-        class Factory(
-            private val activityRepository: ActivityRepository,
-            private val dayItineraryId: Int
-        ) : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return DayInfoViewModel(activityRepository, dayItineraryId) as T
-            }
-        }
+class DayInfoViewModelFactory(
+    private val activityRepository: ActivityRepository
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        return DayInfoViewModel(activityRepository) as T
     }
 }
