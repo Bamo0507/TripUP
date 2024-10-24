@@ -1,231 +1,111 @@
+// DayActivityScreen.kt
 package com.app.tripup.presentation.mainFlow.itinerary.dayActv
 
-import android.content.res.Configuration
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.app.tripup.R
-import com.app.tripup.presentation.ui.theme.MyApplicationTheme
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.app.tripup.data.local.DatabaseModule
+import com.app.tripup.data.local.entities.Activity
+import com.app.tripup.data.repository.ActivityRepository
 
 @Composable
-fun CreateActivityScreen(
-    activityName: String = "",
-    startTime: String = "",
-    endTime: String = "",
-    onBackClick: () -> Unit = {}
+fun DayActivityRoute(
+    dayItineraryId: Int,
+    itineraryTitle: String,
+    date: String,
+    onAddActivityClick: (Int, String, String) -> Unit,
+    onBackClick: () -> Unit
 ) {
+    val context = LocalContext.current
+    val activityRepository = ActivityRepository(
+        DatabaseModule.getDatabase(context).activityDao()
+    )
+    val viewModel: DayActivityViewModel = viewModel(
+        factory = DayActivityViewModelFactory(activityRepository)
+    )
+    val uiState by viewModel.uiState.collectAsState()
 
-    var activityNameState by remember { mutableStateOf(activityName) }
-    var startTimeState by remember { mutableStateOf(startTime) }
-    var endTimeState by remember { mutableStateOf(endTime) }
+    // Iniciamos la carga de datos
+    LaunchedEffect(Unit) {
+        viewModel.loadActivities(dayItineraryId)
+    }
 
+    DayActivityScreen(
+        itineraryTitle = itineraryTitle,
+        date = date,
+        activities = uiState.activities,
+        onAddActivityClick = { onAddActivityClick(dayItineraryId, itineraryTitle, date) },
+        onBackClick = onBackClick
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DayActivityScreen(
+    itineraryTitle: String,
+    date: String,
+    activities: List<Activity>,
+    onAddActivityClick: () -> Unit,
+    onBackClick: () -> Unit
+) {
     Scaffold(
         topBar = {
-            ActivityTopAppBar(onBackClick = onBackClick)
-        }
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .padding(16.dp)
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-            ) {
-
-                ActivityTextField(
-                    value = activityNameState,
-                    label = stringResource(id = R.string.activity_name),
-                    placeholder = "Input",
-                    onValueChange = { activityNameState = it }
-                )
-
-                Text(
-                    text = stringResource(id = R.string.phrase_actv),
-                    fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 16.dp)
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-
-                    ActivityTextField(
-                        value = startTimeState,
-                        label = stringResource(id = R.string.start_time),
-                        placeholder = "8:00 AM",
-                        onValueChange = { startTimeState = it },
-                        modifier = Modifier.weight(1f)
-                    )
-                    Spacer(modifier = Modifier.width(16.dp))
-
-                    ActivityTextField(
-                        value = endTimeState,
-                        label = stringResource(id = R.string.end_time),
-                        placeholder = "8:00 AM",
-                        onValueChange = { endTimeState = it },
-                        modifier = Modifier.weight(1f)
-                    )
+            TopAppBar(
+                title = { Text("$itineraryTitle / $date") },
+                navigationIcon = {
+                    IconButton(onClick = onBackClick) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                    }
                 }
-            }
-
-
-            ActivityCompleteButton(
-                isFormComplete = activityNameState.isNotEmpty() && startTimeState.isNotEmpty() && endTimeState.isNotEmpty(),
-                modifier = Modifier.align(Alignment.End)
             )
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun ActivityTopAppBar(onBackClick: () -> Unit) {
-    TopAppBar(
-        //De momento se dejará así más adelante se implementará la lógica
-        //El título que se muestra dependerá de lo que el usuario haya seleccionado en la pantalla anterior
-        title = { Text(text = "Family Trip/August 5") },
-        navigationIcon = {
-            IconButton(onClick = onBackClick) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-            }
         },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-            titleContentColor = MaterialTheme.colorScheme.onSurface,
-            navigationIconContentColor = MaterialTheme.colorScheme.onSurface
-        )
-    )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun ActivityTextField(
-    value: String,
-    label: String,
-    placeholder: String,
-    onValueChange: (String) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        label = { Text(label) },
-        placeholder = { Text(placeholder) },
-        modifier = modifier.fillMaxWidth(),
-        trailingIcon = {
-            if (value.isNotEmpty()) {
-                IconButton(onClick = { onValueChange("") }) {
-                    Icon(Icons.Filled.Close, contentDescription = "Clear text")
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = onAddActivityClick
+            ) {
+                Icon(Icons.Filled.Add, contentDescription = "Add")
+            }
+        }
+    ) { paddingValues ->
+        if (activities.isEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(text = "No activities found.")
+            }
+        } else {
+            LazyColumn(
+                modifier = Modifier.padding(paddingValues)
+            ) {
+                items(activities) { activity ->
+                    ActivityItem(
+                        activity = activity
+                    )
                 }
             }
-        },
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = MaterialTheme.colorScheme.primary,
-            cursorColor = MaterialTheme.colorScheme.primary
-        ),
-        shape = MaterialTheme.shapes.medium
-    )
-}
-
-@Composable
-fun ActivityCompleteButton(isFormComplete: Boolean, modifier: Modifier = Modifier) {
-    Button(
-        onClick = { /* Acción del botón */ },
-        modifier = modifier
-            .padding(16.dp)
-            .width(140.dp)
-            .height(48.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = if (isFormComplete) {
-                MaterialTheme.colorScheme.primary
-            } else {
-                MaterialTheme.colorScheme.tertiaryContainer
-            }
-        ),
-        shape = CircleShape
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            Icon(Icons.Filled.Check, contentDescription = "Check icon",
-                tint = if (isFormComplete) MaterialTheme.colorScheme.onPrimary else
-                    MaterialTheme.colorScheme.onTertiaryContainer)
-            Spacer(modifier = Modifier.width(7.dp))
-            Text(text = stringResource(id = R.string.complete_button),
-                color = if (isFormComplete) MaterialTheme.colorScheme.onPrimary else
-                    MaterialTheme.colorScheme.onTertiaryContainer
-                )
         }
     }
 }
-
-@Preview(showBackground = true)
 @Composable
-fun PreviewBeforeFilledLight() {
-    MyApplicationTheme {
-        CreateActivityScreen(
-            activityName = "",
-            startTime = "",
-            endTime = ""
-        )
-    }
-
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewAfterFilledLight() {
-    MyApplicationTheme {
-        CreateActivityScreen(
-            activityName = "UNO's Restaurant",
-            startTime = "8:00 AM",
-            endTime = "7:00 PM"
-        )
-    }
-}
-
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-fun PreviewBeforeFilledDark() {
-    MyApplicationTheme {
-        CreateActivityScreen(
-            activityName = "",
-            startTime = "",
-            endTime = ""
-        )
-    }
-}
-
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-fun PreviewAfterFilledDark() {
-    MyApplicationTheme {
-        CreateActivityScreen(
-            activityName = "UNO's Restaurant",
-            startTime = "8:00 AM",
-            endTime = "7:00 PM"
-        )
-    }
+fun ActivityItem(
+    activity: Activity
+) {
+    ListItem(
+        modifier = Modifier.fillMaxWidth(),
+        headlineContent = { Text(activity.name) },
+        supportingContent = { Text("${activity.startTime} - ${activity.endTime}") }
+    )
 }
