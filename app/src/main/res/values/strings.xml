@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="app_name">TripUp</string>
     <string name="signin">Sign in</string>
     <string name="signin_user">User Name</string>
     <string name="signin_password">Password</string>
