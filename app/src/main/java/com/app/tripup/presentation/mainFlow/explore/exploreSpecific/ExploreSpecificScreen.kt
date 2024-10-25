@@ -60,7 +60,8 @@ fun ExploreSpecificScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = query) },  // Mostramos el término de búsqueda
+                title = { Text(text = query,
+                    fontWeight = FontWeight.Bold) },  // Mostramos el término de búsqueda
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(
@@ -93,6 +94,21 @@ fun ExploreSpecificScreen(
                 }
 
                 state.places.isNotEmpty() -> {
+                    // Box con fondo onSurfaceVariant
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f))
+                            .padding(8.dp)
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.search_no_results),
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontStyle = FontStyle.Italic,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                            textAlign = TextAlign.Center
+                        )
+                    }
                     // Mostrar lista de lugares si se encontraron coincidencias
                     LazyColumn {
                         val groupedPlaces = state.places.groupBy { it.category }
@@ -176,12 +192,16 @@ fun PlaceCard(place: Place, onClick: () -> Unit, modifier: Modifier = Modifier) 
                     Text(
                         text = place.name,
                         style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
-                        color = MaterialTheme.colorScheme.surface
+                        color = MaterialTheme.colorScheme.surface,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                     Text(
                         text = place.location,
                         style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
-                        color = MaterialTheme.colorScheme.surface
+                        color = MaterialTheme.colorScheme.surface,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
             }

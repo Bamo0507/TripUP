@@ -17,6 +17,13 @@ import com.app.tripup.data.local.DatabaseModule
 import com.app.tripup.data.repository.ActivityRepository
 import java.util.Calendar
 import androidx.compose.material.icons.filled.AccessTime
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @Composable
 fun DayInfoRoute(
@@ -54,13 +61,12 @@ fun DayInfoRoute(
         onBackClick = onBackClick
     )
 }
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DayInfoScreen(
     itineraryTitle: String,
     date: String,
-    context: android.content.Context,  // Recibir el contexto como parámetro
+    context: android.content.Context,
     activityName: String,
     startTime: String,
     endTime: String,
@@ -74,12 +80,20 @@ fun DayInfoScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("$itineraryTitle / $date") },
+                title = {
+                    Text(
+                        "$itineraryTitle / ${formatDate(date)}",
+                        fontWeight = FontWeight.Bold
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                )
             )
         }
     ) { paddingValues ->
@@ -87,73 +101,99 @@ fun DayInfoScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(16.dp)
+                .padding(horizontal = 24.dp, vertical = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            // Nombre de la actividad
             OutlinedTextField(
                 value = activityName,
                 onValueChange = onActivityNameChanged,
                 label = { Text("Activity Name") },
+                placeholder = { Text("Enter the name of the activity") },
                 trailingIcon = {
                     if (activityName.isNotEmpty()) {
                         IconButton(onClick = { onActivityNameChanged("") }) {
-                            Icon(Icons.Filled.Close, contentDescription = "Clear")
+                            Icon(Icons.Default.Close, contentDescription = "Clear")
                         }
                     }
                 },
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Start Time Field
-            OutlinedTextField(
-                value = startTime,
-                onValueChange = {},
-                label = { Text("Start Time") },
-                trailingIcon = {
-                    IconButton(onClick = {
-                        showTimePickerDialog(context) { time ->
-                            onStartTimeChanged(time)
-                        }
-                    }) {
-                        Icon(Icons.Default.AccessTime, contentDescription = "Select Start Time")
-                    }
-                },
-                readOnly = true,
-                modifier = Modifier.fillMaxWidth()
+            // Selección de Hora de Inicio
+            TimePickerField(
+                label = "Start Time",
+                time = startTime,
+                onTimeSelected = onStartTimeChanged,
+                context = context
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // End Time Field (Usar endTime correctamente)
-            OutlinedTextField(
-                value = endTime,  // Cambiado a endTime
-                onValueChange = {},
-                label = { Text("End Time") },
-                trailingIcon = {
-                    IconButton(onClick = {
-                        showTimePickerDialog(context) { time ->
-                            onEndTimeChanged(time)  // Cambiado a onEndTimeChanged
-                        }
-                    }) {
-                        Icon(Icons.Default.AccessTime, contentDescription = "Select End Time")
-                    }
-                },
-                readOnly = true,
-                modifier = Modifier.fillMaxWidth()
+            // Selección de Hora de Fin
+            TimePickerField(
+                label = "End Time",
+                time = endTime,
+                onTimeSelected = onEndTimeChanged,
+                context = context
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Button(
-                onClick = onSaveActivity,
-                enabled = isFormComplete,
-                modifier = Modifier.fillMaxWidth()
+            // Botón de Guardar Actividad
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.BottomEnd
             ) {
-                Text("Save Activity")
+                Button(
+                    onClick = onSaveActivity,
+                    enabled = isFormComplete,
+                    shape = MaterialTheme.shapes.large,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary,
+                        disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
+                        disabledContentColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
+                    ),
+                    modifier = Modifier.padding(vertical = 16.dp)
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Filled.Check, contentDescription = "Save")
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Save Activity")
+                    }
+                }
             }
         }
     }
+}
+
+@Composable
+fun TimePickerField(
+    label: String,
+    time: String,
+    onTimeSelected: (String) -> Unit,
+    context: android.content.Context
+) {
+    OutlinedTextField(
+        value = time,
+        onValueChange = {},
+        label = { Text(label) },
+        trailingIcon = {
+            IconButton(onClick = {
+                showTimePickerDialog(context) { selectedTime ->
+                    onTimeSelected(selectedTime)
+                }
+            }) {
+                Icon(Icons.Default.AccessTime, contentDescription = "Select Time",
+                    tint = MaterialTheme.colorScheme.primary)
+            }
+        },
+        readOnly = true,
+        modifier = Modifier.fillMaxWidth()
+    )
+}
+
+fun formatDate(dateString: String): String {
+    val formatter = DateTimeFormatter.ofPattern("MMMM d", Locale.getDefault())
+    val parsedDate = LocalDate.parse(dateString)
+    return parsedDate.format(formatter)
 }
 
 fun showTimePickerDialog(
@@ -172,4 +212,23 @@ fun showTimePickerDialog(
         true
     )
     timePickerDialog.show()
+}
+
+@Preview(showBackground = true)
+@Composable
+fun DayInfoScreenPreview() {
+    DayInfoScreen(
+        itineraryTitle = "Paris Trip",
+        date = "2024-10-24",
+        context = LocalContext.current,
+        activityName = "Lunch",
+        startTime = "12:00",
+        endTime = "13:00",
+        onActivityNameChanged = {},
+        onStartTimeChanged = {},
+        onEndTimeChanged = {},
+        onSaveActivity = {},
+        isFormComplete = false,
+        onBackClick = {}
+    )
 }

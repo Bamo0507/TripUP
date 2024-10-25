@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
@@ -13,10 +14,17 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.app.tripup.data.local.DatabaseModule
 import com.app.tripup.data.local.entities.Activity
 import com.app.tripup.data.repository.ActivityRepository
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @Composable
 fun DayActivityRoute(
@@ -61,19 +69,29 @@ fun DayActivityScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("$itineraryTitle / $date") },
+                title = {
+                    Text(
+                        "$itineraryTitle / ${formatDate(date)}",
+                        fontWeight = FontWeight.Bold
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                )
             )
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = onAddActivityClick
+                onClick = onAddActivityClick,
+                containerColor = MaterialTheme.colorScheme.secondary,
+                contentColor = MaterialTheme.colorScheme.onSecondary
             ) {
-                Icon(Icons.Filled.Add, contentDescription = "Add")
+                Icon(Icons.Filled.Add, contentDescription = "Add Activity")
             }
         }
     ) { paddingValues ->
@@ -84,10 +102,16 @@ fun DayActivityScreen(
                     .padding(paddingValues),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = "No activities found.")
+                Text(
+                    text = "No activities found.",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         } else {
             LazyColumn(
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
                 modifier = Modifier.padding(paddingValues)
             ) {
                 items(activities) { activity ->
@@ -99,13 +123,76 @@ fun DayActivityScreen(
         }
     }
 }
+
+fun formatDate(dateString: String): String {
+    val formatter = DateTimeFormatter.ofPattern("MMMM d", Locale.getDefault())
+    val parsedDate = LocalDate.parse(dateString)
+    return parsedDate.format(formatter)
+}
+
+
 @Composable
 fun ActivityItem(
     activity: Activity
 ) {
-    ListItem(
-        modifier = Modifier.fillMaxWidth(),
-        headlineContent = { Text(activity.name) },
-        supportingContent = { Text("${activity.startTime} - ${activity.endTime}") }
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .clickable { /* Handle activity click */ },
+        shadowElevation = 4.dp,
+        tonalElevation = 6.dp,
+        shape = MaterialTheme.shapes.medium,
+        color = MaterialTheme.colorScheme.inverseOnSurface
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth()
+        ) {
+            Text(
+                text = activity.name,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.AccessTime,
+                    contentDescription = "Activity Time",
+                    tint = MaterialTheme.colorScheme.primary
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "${activity.startTime} - ${activity.endTime}",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewDayActivityScreen() {
+    val sampleActivities = listOf(
+        Activity(dayItineraryId = 1, name = "Breakfast", startTime = "08:00", endTime = "09:00"),
+        Activity(dayItineraryId = 2, name = "City Tour", startTime = "10:00", endTime = "12:00"),
+        Activity(dayItineraryId = 3, name = "Lunch", startTime = "13:00", endTime = "14:00"),
+        Activity(dayItineraryId = 4, name = "Museum Visit", startTime = "15:00", endTime = "17:00")
+    )
+
+    DayActivityScreen(
+        itineraryTitle = "Paris Trip",
+        date = "2024-10-24",
+        activities = sampleActivities,
+        onAddActivityClick = { /* TODO: Handle Add Activity */ },
+        onBackClick = { /* TODO: Handle Back */ }
     )
 }
+

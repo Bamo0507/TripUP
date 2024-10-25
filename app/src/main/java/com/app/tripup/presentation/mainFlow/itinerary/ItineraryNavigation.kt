@@ -54,7 +54,7 @@ fun NavGraphBuilder.itineraryGraph(
                 }
             },
             onBackClick = {
-                navController.popBackStack()
+                navController.navigateUp()
             }
         )
 
@@ -70,7 +70,7 @@ fun NavGraphBuilder.itineraryGraph(
                 )
             },
             onBackClick = {
-                navController.popBackStack()
+                navController.navigateUp()
             }
         )
 
@@ -86,17 +86,17 @@ fun NavGraphBuilder.itineraryGraph(
                 )
             },
             onBackClick = {
-                navController.popBackStack()
+                navController.navigateUp()
             }
         )
 
         // Pantalla de añadir información al día
         dayInfoScreen(
             onActivityCreated = {
-                navController.popBackStack()
+                navController.navigateUp()
             },
             onBackClick = {
-                navController.popBackStack()
+                navController.navigateUp()
             }
         )
     }

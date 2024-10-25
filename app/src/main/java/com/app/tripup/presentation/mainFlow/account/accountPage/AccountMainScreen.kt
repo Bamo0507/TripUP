@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,6 +20,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -51,136 +55,122 @@ fun AccountRoute(
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AccountScreen(
     onLogoutClick: () -> Unit,
     userPreferences: UserPreferences,
-    modifier: Modifier = Modifier,
     userName: String = "Usuario"
 ) {
-
     val coroutineScope = rememberCoroutineScope()
 
-
-    Scaffold() { innerPadding ->
+    Scaffold { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            // Fondo con la imagen 'citytemplate'
+            // Fondo de la Ciudad con Avatar del Usuario
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(180.dp) // Altura del fondo (ciudad)
+                    .height(200.dp) // Aumentar altura para mejorar la estética
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.citytemplate),
-                    contentScale = ContentScale.Crop, // Ajusta la imagen para que llene el espacio
-                    contentDescription = "City background",
+                    contentDescription = "City Background",
+                    contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize()
                 )
 
-                Spacer(modifier = Modifier.size(40.dp))
-
-                // Avatar (imagen de usuario) centrado
                 Column(
                     modifier = Modifier
-                        .align(Alignment.BottomCenter) // Alineación centrada y en la parte inferior del fondo
-                        .offset(y = 60.dp), // Desplazamos hacia abajo para que sobresalga,
+                        .align(Alignment.BottomCenter)
+                        .offset(y = 70.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+                    // Imagen del Avatar
                     Image(
-                        painter = painterResource(id = R.drawable.user_avatar), // Reemplaza con la imagen del usuario
+                        painter = painterResource(id = R.drawable.user_avatar),
                         contentDescription = "User Avatar",
                         modifier = Modifier
                             .size(150.dp)
                             .clip(CircleShape)
-                            .border(2.dp, Color.White, CircleShape) // Borde blanco para que destaque
+                            .border(2.dp, Color.White, CircleShape)
                     )
-                    // Nombre del usuario
+                    // Nombre del Usuario
                     Text(
                         text = userName,
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.padding(top = 8.dp)
                     )
-                    Spacer(modifier = Modifier.height(12.dp))
-
                 }
             }
 
-            Spacer(modifier = Modifier.height(48.dp))
+            Spacer(modifier = Modifier.height(68.dp))
 
-            // Opciones de la cuenta (las opciones ya estaban correctas según tu comentario)
+            // Opciones de la Cuenta
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(20.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
+                    .padding(horizontal = 24.dp, vertical = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                /*
-                AccountOption(
-                    icon = Icons.Default.Favorite,
-                    label = stringResource(id = R.string.your_favorites),
-                    iconTint = MaterialTheme.colorScheme.tertiaryContainer
-                )
-                //EN DEBATE DE SI SE AGREGARÁ
-                // Spacer(modifier = Modifier.height(16.dp))
 
-                AccountOption(
-                    icon = Icons.Default.Send,
-                    label = stringResource(id = R.string.past_trips),
-                    iconTint = MaterialTheme.colorScheme.secondary
-                )
-                */
-
-                Spacer(modifier = Modifier.height(16.dp))
-
+                // Opción de Log Out
                 AccountOption(
                     icon = Icons.Default.ExitToApp,
                     label = stringResource(id = R.string.logout),
-                    iconTint = MaterialTheme.colorScheme.primary,
-                    navAction = {
-                        coroutineScope.launch {
-                            userPreferences.setLoggedIn(false)
-                            onLogoutClick()
-                        }
+                    iconTint = MaterialTheme.colorScheme.primary
+                ) {
+                    coroutineScope.launch {
+                        userPreferences.setLoggedIn(false)
+                        onLogoutClick()
                     }
-                )
+                }
             }
         }
     }
 }
-
-
 @Composable
-fun AccountOption(icon: ImageVector, label: String, iconTint: Color, navAction: ()-> Unit = {}) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
+fun AccountOption(
+    icon: ImageVector,
+    label: String,
+    iconTint: Color,
+    navAction: () -> Unit = {}
+) {
+    Card(
+        shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.inverseOnSurface
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .clickable {
-                navAction()
-            }
-            .padding(horizontal = 32.dp, vertical = 16.dp)
+            .clickable { navAction() }
+            .padding(horizontal = 12.dp, vertical = 8.dp)
     ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = iconTint,
-            modifier = Modifier.size(36.dp)
-        )
-        Spacer(modifier = Modifier.width(16.dp))
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodyLarge,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurface
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = iconTint,
+                modifier = Modifier.size(40.dp)
+            )
+            Spacer(modifier = Modifier.width(20.dp))
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
     }
-}
 
+}
 
