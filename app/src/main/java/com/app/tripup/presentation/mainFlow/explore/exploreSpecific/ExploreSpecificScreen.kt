@@ -2,6 +2,7 @@ package com.app.tripup.presentation.mainFlow.explore.exploreSpecific
 
 
 import android.content.res.Configuration
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -12,6 +13,8 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.*
 import androidx.compose.ui.text.style.*
@@ -27,41 +30,39 @@ import com.app.tripup.presentation.ui.theme.MyApplicationTheme
 
 @Composable
 fun ExploreSpecificRoute(
-    query: String, // El término de búsqueda que se pasa
+    query: String,
     viewModel: ExploreSpecificViewModel = viewModel(),
-    onPlaceClick: (Int) -> Unit, // Para la navegación cuando se selecciona un lugar
+    onPlaceClick: (Int) -> Unit,
     onBackClick: () -> Unit
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
-    // Llamar a la función de búsqueda cada vez que cambie el término de búsqueda
+    // Ejecuta la búsqueda solo una vez por término
     LaunchedEffect(query) {
         viewModel.searchPlaces(query)
     }
 
-    // Pasamos el estado y el query a la pantalla
     ExploreSpecificScreen(
-        query = query, // Se pasa el término de búsqueda
+        query = query,
         state = state,
         onPlaceClick = onPlaceClick,
         onBackClick = onBackClick
     )
 }
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExploreSpecificScreen(
-    query: String,  // Se agrega el término de búsqueda como parámetro
+    query: String,
     state: ExploreSpecificState,
-    modifier: Modifier = Modifier,
     onBackClick: () -> Unit = {},
     onPlaceClick: (Int) -> Unit = {}
 ) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = query,
-                    fontWeight = FontWeight.Bold) },  // Mostramos el término de búsqueda
+                title = { Text(text = query, fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(
@@ -76,15 +77,13 @@ fun ExploreSpecificScreen(
             )
         }
     ) { innerPadding ->
-
         Column(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
             when {
                 state.isLoading -> {
-                    // Mostrar un indicador de carga si es necesario
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
@@ -94,22 +93,6 @@ fun ExploreSpecificScreen(
                 }
 
                 state.places.isNotEmpty() -> {
-                    // Box con fondo onSurfaceVariant
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f))
-                            .padding(8.dp)
-                    ) {
-                        Text(
-                            text = stringResource(id = R.string.search_no_results),
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontStyle = FontStyle.Italic,
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                    // Mostrar lista de lugares si se encontraron coincidencias
                     LazyColumn {
                         val groupedPlaces = state.places.groupBy { it.category }
                         groupedPlaces.forEach { (category, placeList) ->
@@ -123,17 +106,17 @@ fun ExploreSpecificScreen(
                                     },
                                     style = MaterialTheme.typography.headlineSmall,
                                     fontWeight = FontWeight.Bold,
-                                    modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp)
+                                    modifier = Modifier.padding(16.dp)
                                 )
+
                                 LazyRow(
                                     contentPadding = PaddingValues(horizontal = 16.dp),
                                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                                 ) {
                                     items(placeList) { place ->
                                         PlaceCard(
-                                            place,
-                                            onClick = { onPlaceClick(place.id) },
-                                            modifier = Modifier.width(200.dp)
+                                            place = place,
+                                            onClick = { onPlaceClick(place.id) }
                                         )
                                     }
                                 }
@@ -142,16 +125,24 @@ fun ExploreSpecificScreen(
                     }
                 }
 
-                state.noResultsMessage != null -> {
-                    // Mostrar el mensaje de "no hay resultados"
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
+                else -> {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
                     ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.notfound),
+                            contentDescription = null,
+                            contentScale = ContentScale.Fit,
+                            modifier = Modifier.size(250.dp)
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            text = state.noResultsMessage ?: "No se encontraron resultados",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.error
+                            text = state.noResultsMessage ?: "",
+                            style = MaterialTheme.typography.titleMedium
                         )
                     }
                 }

@@ -1,10 +1,12 @@
 // DayActivityScreen.kt
 package com.app.tripup.presentation.mainFlow.itinerary.dayActv
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Add
@@ -13,12 +15,17 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.app.tripup.R
 import com.app.tripup.data.local.DatabaseModule
 import com.app.tripup.data.local.entities.Activity
 import com.app.tripup.data.repository.ActivityRepository
@@ -99,14 +106,33 @@ fun DayActivityScreen(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(paddingValues),
+                    .padding(16.dp),  // Espaciado general más consistente
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = "No activities found.",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    // Imagen
+                    Box(
+                        modifier = Modifier
+                            .padding(bottom = 16.dp),  // Espacio entre la imagen y el texto
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.notfound),
+                            contentDescription = null,  // Accesibilidad (opcional si es decorativa)
+                            contentScale = ContentScale.Fit,
+                            modifier = Modifier.size(250.dp)
+                        )
+                    }
+
+                    // Texto
+                    Text(
+                        text = stringResource(id = R.string.no_activities),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
             }
         } else {
             LazyColumn(
@@ -196,3 +222,16 @@ fun PreviewDayActivityScreen() {
     )
 }
 
+@Preview(showBackground = true)
+@Composable
+fun PreviewDayActivityScreenEmpty() {
+    val sampleActivities = emptyList<Activity>()
+
+    DayActivityScreen(
+        itineraryTitle = "Paris Trip",
+        date = "2024-10-24",
+        activities = sampleActivities,
+        onAddActivityClick = { /* TODO: Handle Add Activity */ },
+        onBackClick = { /* TODO: Handle Back */ }
+    )
+}

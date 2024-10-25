@@ -105,8 +105,8 @@ fun ItineraryCreationScreen(
             OutlinedTextField(
                 value = title,
                 onValueChange = onTitleChanged,
-                label = { Text("Itinerary Title") },
-                placeholder = { Text("Give your trip a memorable name") },
+                label = { Text(stringResource(id = R.string.itinerary_title)) },
+                placeholder = { Text(stringResource(id=R.string.memorable_name)) },
                 trailingIcon = {
                     if (title.isNotEmpty()) {
                         IconButton(onClick = { onTitleChanged("") }) {
@@ -119,13 +119,13 @@ fun ItineraryCreationScreen(
             )
 
             DatePickerField(
-                label = "Start Date",
+                label = stringResource(id = R.string.start_time),
                 date = startDate,
                 onDateSelected = onStartDateChanged
             )
 
             DatePickerField(
-                label = "End Date",
+                label = stringResource(id=R.string.end_time),
                 date = endDate,
                 onDateSelected = onEndDateChanged
             )
@@ -145,7 +145,9 @@ fun ItineraryCreationScreen(
                 ) {
                     Row {
                         Icon(Icons.Filled.Check, contentDescription = "Agregar")
-                        Text(text = stringResource(id = R.string.complete_button), modifier = androidx.compose.ui.Modifier.padding(start = 8.dp))
+                        Text(text = stringResource(id = R.string.complete_button), modifier = androidx.compose.ui.Modifier.padding(
+                            start = 8.dp
+                        ))
                     }
                 }
             }

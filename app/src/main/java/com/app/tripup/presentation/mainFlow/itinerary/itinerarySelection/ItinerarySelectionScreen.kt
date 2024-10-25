@@ -57,10 +57,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.app.tripup.R
 import com.app.tripup.data.local.DatabaseModule
 import com.app.tripup.data.local.entities.DayItinerary
 import com.app.tripup.data.repository.DayItineraryRepository
@@ -132,7 +134,7 @@ fun ItinerarySelectionScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "No days found.",
+                    text = stringResource(id = R.string.no_days),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

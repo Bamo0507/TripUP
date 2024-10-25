@@ -193,7 +193,7 @@ fun LocationInfoScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(text = "Lugar no encontrado", color = MaterialTheme.colorScheme.error)
+                    Text(text = stringResource(id = R.string.place_not_fount), color = MaterialTheme.colorScheme.error)
                 }
             }
         }

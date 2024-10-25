@@ -19,8 +19,10 @@ import java.util.Calendar
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import com.app.tripup.R
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -108,8 +110,8 @@ fun DayInfoScreen(
             OutlinedTextField(
                 value = activityName,
                 onValueChange = onActivityNameChanged,
-                label = { Text("Activity Name") },
-                placeholder = { Text("Enter the name of the activity") },
+                label = { Text(stringResource(id = R.string.activity_name)) },
+                placeholder = { Text(stringResource(id = R.string.activity_placeholder)) },
                 trailingIcon = {
                     if (activityName.isNotEmpty()) {
                         IconButton(onClick = { onActivityNameChanged("") }) {
@@ -122,7 +124,7 @@ fun DayInfoScreen(
 
             // Selección de Hora de Inicio
             TimePickerField(
-                label = "Start Time",
+                label = stringResource(id = R.string.start_time),
                 time = startTime,
                 onTimeSelected = onStartTimeChanged,
                 context = context
@@ -130,7 +132,7 @@ fun DayInfoScreen(
 
             // Selección de Hora de Fin
             TimePickerField(
-                label = "End Time",
+                label = stringResource(id = R.string.end_time),
                 time = endTime,
                 onTimeSelected = onEndTimeChanged,
                 context = context
@@ -156,7 +158,7 @@ fun DayInfoScreen(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Filled.Check, contentDescription = "Save")
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Save Activity")
+                        Text(stringResource(id = R.string.activity_save))
                     }
                 }
             }

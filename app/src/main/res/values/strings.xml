@@ -18,6 +18,7 @@
     <string name="category_hotels">Hotels</string>
     <string name="category_drinks">Drinks</string>
     <string name="category_activities">Activities</string>
+    <string name="place_not_fount">Place not found</string>
 
     <!-- Place detail screen strings -->
     <string name="place_add_button">Add</string>
@@ -51,6 +52,7 @@
     <string name="end_time">End Time</string>
     <string name="complete_button">Complete</string>
     <string name="phrase_actv">What are we doing?</string>
+    <string name="activity_placeholder">Enter the name of the activity</string>
 
     <!-- Itinerary Creation Screen -->
     <string name="itinerary_title">Itinerary Title</string>
@@ -78,6 +80,13 @@
     <string name="activity_name_example_2">Disney World</string>
     <string name="start_time_example_2">9:00 AM</string>
     <string name="end_time_example_2">22:00 PM</string>
+    <string name="activity_save">Save Activity</string>
+
+
+    <string name="no_activities">There are no activities!!</string>
+    <string name="no_results_found">No results were found for </string>
+    <string name="no_itineraries">There are no itineraries!</string>
+    <string name="no_days">No days found</string>
 
     <string name="error_place_not_found">Place not found</string>
 </resources>
