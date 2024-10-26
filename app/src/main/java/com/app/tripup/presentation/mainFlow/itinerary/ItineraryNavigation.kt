@@ -48,7 +48,7 @@ fun NavGraphBuilder.itineraryGraph(
             onItineraryCreated = { itineraryId ->
                 navController.navigate(ItinerarySelectionDestination(itineraryId.toInt())) {
                     popUpTo(ItineraryMainDestination) {
-                        inclusive = true
+                        inclusive = false
                     }
                 }
             },
