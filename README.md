@@ -33,7 +33,6 @@ TripUp tiene como objetivo ayudar a los viajeros a dedicar menos tiempo a la pla
 - **Usuario:** `1`
 - **Contraseña:** `1`
 
-Por favor, tomarlo en cuenta al correr la aplicación.
 ---
 
 ## Servicios
@@ -52,9 +51,9 @@ Hemos evaluado el uso de servicios externos para obtener información de lugares
 
 ### Servicios Propios (Desarrollados por Nosotros)
 
-- **Base de Datos Local:** Mientras completamos la integración con Firebase, utilizamos una base de datos local integrada en la aplicación para manejar los datos de los lugares turísticos y usuarios. Esto nos permite desarrollar y probar funcionalidades sin depender de una conexión a internet, esta información se encuentra en los archivos 'PlaceDb.kt' y 'SearchDb.kt'.
+- **Base de Datos Local:** Mientras completamos la integración con Firebase, utilizamos una base de datos local integrada en la aplicación para manejar los datos de los lugares turísticos y usuarios. Esto nos permite desarrollar y probar funcionalidades sin depender de una conexión a internet, esta información se encuentra en los archivos `PlaceDb.kt` y `SearchPlaceDb.kt`.
 
-- **Repositorio Local para Autenticación:** Actualmente, para fines de prueba, tenemos un repositorio local que verifica el inicio de sesión con credenciales predefinidas. Este enfoque nos permite validar la funcionalidad de autenticación mientras implementamos la solución basada en Firebase.
+- **Repositorio Local para Autenticación:** Actualmente, para fines de prueba, tenemos un repositorio local que verifica el inicio de sesión con credenciales predefinidas. Este enfoque nos permite validar la funcionalidad de autenticación mientras implementamos la solución basada en Firebase. Esto ya se mencionó anteriormente en caso de probar la aplicación.
 
 ## Librerías
 
@@ -66,16 +65,16 @@ Aunque todavía no hemos integrado Firebase, planeamos utilizar los siguientes S
 
 - **Firebase BoM (Bill of Materials):** Gestionará las versiones de los diferentes SDKs de Firebase utilizados en la aplicación.
 
+  ```kotlin
+  implementation(platform("com.google.firebase:firebase-bom:32.2.0"))
+  ```
+
 - **Firebase Realtime Database:** Permitirá la integración con la base de datos en tiempo real de Firebase para almacenar y sincronizar datos de lugares turísticos.
 
   ```kotlin
   implementation("com.google.firebase:firebase-database-ktx")
   ```
-- **Firebase Realtime Database:** Permitirá la integración con la base de datos en tiempo real de Firebase para almacenar y sincronizar datos de lugares turísticos.
-
-  ```kotlin
-  implementation("com.google.firebase:firebase-database-ktx")
-  ```
+  
 - **Firebase Authentication:** Facilitará la autenticación de usuarios, incluyendo la integración con proveedores de identidad como Google.
 
   ```kotlin
@@ -90,5 +89,16 @@ Aunque todavía no hemos integrado Firebase, planeamos utilizar los siguientes S
 
 ## Nota Importante
 A medida que avancemos en el desarrollo e integremos Firebase y Google Sign-In, actualizaremos las dependencias y adaptaremos la arquitectura de la aplicación para aprovechar al máximo estas tecnologías.
+
+Además, es imporante mencionar que para que funcionen correctamente las librerías indicadas anteriormente se deben habilitar los servicios de Google en el Gradle, esto se hace en el archivo `build.gradle.kts`, y lo único que se debe hacer es incluir lo siguiente:
+
+ ```kotlin
+  plugins {
+      id("com.google.gms.google-services")
+  }
+  ```
+
+
+
 
   
