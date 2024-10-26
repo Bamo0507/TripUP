@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -88,7 +89,8 @@ fun SplashScreen(
                 contentDescription = "Airplane Icon",
                 modifier = Modifier
                     .size(150.dp)
-                    .scale(scale)
+                    .scale(scale),
+                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
