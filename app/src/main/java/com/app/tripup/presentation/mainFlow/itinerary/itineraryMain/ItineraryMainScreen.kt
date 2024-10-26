@@ -1,4 +1,3 @@
-// ItineraryMainScreen.kt
 package com.app.tripup.presentation.mainFlow.itinerary.itineraryMain
 
 import android.annotation.SuppressLint
@@ -25,6 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.app.tripup.R
 import com.app.tripup.data.local.DatabaseModule
@@ -45,7 +45,7 @@ fun ItineraryMainRoute(
     val viewModel: ItineraryMainViewModel = viewModel(
         factory = ItineraryMainViewModelFactory(itineraryRepository)
     )
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     ItineraryMainScreen(
         itineraries = uiState.itineraries,

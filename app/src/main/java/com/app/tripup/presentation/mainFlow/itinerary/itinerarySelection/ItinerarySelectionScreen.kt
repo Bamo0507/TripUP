@@ -1,4 +1,3 @@
-// ItinerarySelectionScreen.kt
 package com.app.tripup.presentation.mainFlow.itinerary.itinerarySelection
 
 import androidx.compose.foundation.clickable
@@ -61,10 +60,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.app.tripup.R
 import com.app.tripup.data.local.DatabaseModule
+import com.app.tripup.data.local.entities.Activity
 import com.app.tripup.data.local.entities.DayItinerary
+import com.app.tripup.data.repository.ActivityRepository
 import com.app.tripup.data.repository.DayItineraryRepository
 import com.app.tripup.data.repository.ItineraryRepository
 import java.time.LocalDate
@@ -79,42 +81,57 @@ fun ItinerarySelectionRoute(
     onBackClick: () -> Unit
 ) {
     val context = LocalContext.current
+
+    // Inicializa los repositorios
     val dayItineraryRepository = DayItineraryRepository(
         DatabaseModule.getDatabase(context).dayItineraryDao()
     )
     val itineraryRepository = ItineraryRepository(
         DatabaseModule.getDatabase(context).itineraryDao()
     )
-    val viewModel: ItinerarySelectionViewModel = viewModel(
-        factory = ItinerarySelectionViewModelFactory(dayItineraryRepository, itineraryRepository)
+    val activityRepository = ActivityRepository(
+        DatabaseModule.getDatabase(context).activityDao()
     )
-    val uiState by viewModel.uiState.collectAsState()
 
+    // Obtén el ViewModel utilizando la fábrica personalizada
+    val viewModel: ItinerarySelectionViewModel = viewModel(
+        factory = ItinerarySelectionViewModelFactory(
+            dayItineraryRepository,
+            itineraryRepository,
+            activityRepository
+        )
+    )
+
+    // Observa el estado del ViewModel
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    // Carga los días con el conteo de actividades al iniciar la pantalla
     LaunchedEffect(Unit) {
-        viewModel.loadDays(itineraryId)
+        viewModel.loadDaysWithActivityCount(itineraryId)
     }
 
+    // Llama a la pantalla con los datos actualizados
     ItinerarySelectionScreen(
         itineraryTitle = uiState.itineraryTitle,
-        days = uiState.dayItineraries,
+        daysWithCount = uiState.dayItinerariesWithCount,
         onDaySelected = onDaySelected,
         onBackClick = onBackClick
     )
 }
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ItinerarySelectionScreen(
     itineraryTitle: String,
-    days: List<DayItinerary>,
+    daysWithCount: List<Pair<DayItinerary, Int>>,
     onDaySelected: (Int, String, String) -> Unit,
     onBackClick: () -> Unit
 ) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = itineraryTitle,
-                    fontWeight = FontWeight.Bold) },
+                title = { Text(text = itineraryTitle, fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
@@ -126,7 +143,7 @@ fun ItinerarySelectionScreen(
             )
         }
     ) { paddingValues ->
-        if (days.isEmpty()) {
+        if (daysWithCount.isEmpty()) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -145,13 +162,13 @@ fun ItinerarySelectionScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 modifier = Modifier.padding(paddingValues)
             ) {
-                items(days) { day ->
+                items(daysWithCount) { (day, activityCount) ->
                     DayCard(
                         dayItinerary = day,
+                        activityCount = activityCount,
                         onClick = {
                             onDaySelected(day.id, itineraryTitle, day.date)
-                        },
-                        index = days.indexOf(day)
+                        }
                     )
                 }
             }
@@ -159,69 +176,14 @@ fun ItinerarySelectionScreen(
     }
 }
 
-// Lista de íconos relacionados con actividades, viajes y ocio.
-val dayIcons = listOf(
-    Icons.Default.BeachAccess,       // Playa
-    Icons.Default.Support,           // Apoyo / Asistencia
-    Icons.Default.Surfing,           // Surf
-    Icons.Default.Air,               // Aire libre
-    Icons.Default.Diversity3,        // Grupos / Comunidad
-    Icons.Default.DirectionsBoat,    // Bote / Navegación
-    Icons.Default.DirectionsBike,    // Paseo en bicicleta
-    Icons.Default.Hiking,            // Caminata / Senderismo
-    Icons.Default.FlightTakeoff,     // Despegue de vuelo
-    Icons.Default.Hotel,             // Hospedaje / Hotel
-    Icons.Default.LocalDining,       // Restaurante / Comida
-    Icons.Default.Nightlife,         // Vida nocturna
-    Icons.Default.Event,             // Evento / Actividad
-    Icons.Default.Festival,          // Festival
-    Icons.Default.Map,               // Mapa / Ubicación
-    Icons.Default.Train,             // Tren / Transporte
-    Icons.Default.Park,              // Parque / Naturaleza
-    Icons.Default.PhotoCamera,       // Fotografía / Turismo
-    Icons.Default.Pool,              // Piscina / Natación
-    Icons.Default.SportsSoccer,      // Deportes / Fútbol
-    Icons.Default.SportsBasketball,  // Deportes / Básquetbol
-    Icons.Default.SportsEsports,     // Videojuegos / Esports
-    Icons.Default.Luggage,           // Equipaje / Maletas
-    Icons.Default.CarRental,         // Renta de autos
-    Icons.Default.Flight,            // Vuelo
-    Icons.Default.LocalBar,          // Bar / Bebidas
-    Icons.Default.TheaterComedy,     // Teatro / Entretenimiento
-    Icons.Default.Spa,               // Spa / Relajación
-    Icons.Default.MusicNote,         // Música / Conciertos
-    Icons.Default.Castle,            // Castillo / Monumento histórico
-    Icons.Default.Museum,            // Museo
-    Icons.Default.Forest,            // Bosque / Naturaleza
-    Icons.Default.Waves,             // Olas / Surf
-    Icons.Default.Coffee,            // Café / Desayuno
-    Icons.Default.LocalMall,         // Shopping / Compras
-    Icons.Default.IceSkating,        // Patinaje / Actividades invernales
-    Icons.Default.Snowboarding,      // Snowboarding / Nieve
-    Icons.Default.Sailing,           // Vela / Navegación
-    Icons.Default.Bed,               // Descanso / Dormir
-    Icons.Default.ElectricScooter,   // Scooter / Movilidad urbana
-    Icons.Default.Motorcycle,        // Motocicleta / Paseo
-    Icons.Default.VideogameAsset,    // Videojuegos
-    Icons.Default.Book,              // Lectura / Relax
-)
-
-// Función para obtener un ícono aleatorio.
-fun getRandomIcon(): ImageVector {
-    return dayIcons[Random.nextInt(dayIcons.size)]
-}
-
 @Composable
 fun DayCard(
     dayItinerary: DayItinerary,
-    index: Int,
+    activityCount: Int,
     onClick: () -> Unit
 ) {
     val formatter = DateTimeFormatter.ofPattern("MMMM d", Locale.getDefault())
     val formattedDate = LocalDate.parse(dayItinerary.date).format(formatter)
-
-    // Ícono basado en el índice del día.
-    val icon = remember { getRandomIcon() }
 
     Card(
         modifier = Modifier
@@ -241,15 +203,11 @@ fun DayCard(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = "$formattedDate",
+                text = formattedDate,
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Bold
             )
-            Icon(
-                imageVector = icon,
-                contentDescription = "Icon for $formattedDate",
-                tint = MaterialTheme.colorScheme.primary
-            )
+            Text(text = if(activityCount == 1) "$activityCount Activity" else "$activityCount Activities")
         }
     }
 }

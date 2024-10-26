@@ -1,4 +1,3 @@
-// DayActivityNavigation.kt
 package com.app.tripup.presentation.mainFlow.itinerary.dayActv
 
 import androidx.navigation.NavController

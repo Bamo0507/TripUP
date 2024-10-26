@@ -1,4 +1,3 @@
-// DatabaseModule.kt
 package com.app.tripup.data.local
 
 import android.content.Context

@@ -62,7 +62,9 @@ fun ExploreSpecificScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = query, fontWeight = FontWeight.Bold) },
+                title = { Text(text = query, fontWeight = FontWeight.Bold,
+                    maxLines = 1, overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(end = 6.dp)) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(
@@ -142,7 +144,9 @@ fun ExploreSpecificScreen(
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
                             text = state.noResultsMessage ?: "",
-                            style = MaterialTheme.typography.titleMedium
+                            style = MaterialTheme.typography.titleMedium,
+                            textAlign = TextAlign.Center,
+
                         )
                     }
                 }

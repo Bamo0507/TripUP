@@ -1,4 +1,3 @@
-// AccountNavigation.kt
 package com.app.tripup.presentation.mainFlow.account
 
 import androidx.navigation.NavController

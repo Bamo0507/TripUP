@@ -1,4 +1,3 @@
-// ItineraryMainViewModel.kt
 package com.app.tripup.presentation.mainFlow.itinerary.itineraryMain
 
 import androidx.lifecycle.ViewModel

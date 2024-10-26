@@ -1,4 +1,3 @@
-// DayInfoScreen.kt
 package com.app.tripup.presentation.mainFlow.itinerary.addInfoDay
 
 import android.app.TimePickerDialog
@@ -22,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.app.tripup.R
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -43,7 +43,7 @@ fun DayInfoRoute(
     val viewModel: DayInfoViewModel = viewModel(
         factory = DayInfoViewModelFactory(activityRepository)
     )
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     DayInfoScreen(
         itineraryTitle = itineraryTitle,

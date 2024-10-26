@@ -1,4 +1,3 @@
-// MainFlowNavigation.kt
 package com.app.tripup.presentation.mainFlow
 
 import androidx.compose.runtime.Composable

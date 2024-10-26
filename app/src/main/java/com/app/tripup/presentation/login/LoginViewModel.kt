@@ -1,10 +1,10 @@
-// LoginViewModel.kt
 package com.app.tripup.presentation.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.app.tripup.domain.UserPreferences
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -54,6 +54,8 @@ class LoginViewModel(
             }
 
             _loginState.update { it.copy(isLoading = true) }
+
+            delay(4000)
 
             val loggedStatus = loginRepository.login(screenState.email, screenState.password)
             if (loggedStatus) {

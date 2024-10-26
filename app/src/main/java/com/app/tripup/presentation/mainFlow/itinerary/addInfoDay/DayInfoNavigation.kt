@@ -1,4 +1,3 @@
-// DayInfoNavigation.kt
 package com.app.tripup.presentation.mainFlow.itinerary.addInfoDay
 
 import androidx.navigation.NavController

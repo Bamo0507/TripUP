@@ -1,4 +1,3 @@
-// DayInfoState.kt
 package com.app.tripup.presentation.mainFlow.itinerary.addInfoDay
 
 data class DayInfoState(

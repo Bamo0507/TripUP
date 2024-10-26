@@ -1,4 +1,3 @@
-// SplashViewModelFactory.kt
 package com.app.tripup.presentation.splash
 
 import androidx.lifecycle.ViewModel

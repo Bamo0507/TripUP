@@ -1,4 +1,3 @@
-// Activity.kt
 package com.app.tripup.data.local.entities
 
 import androidx.room.Entity

@@ -1,4 +1,3 @@
-// ItineraryMainState.kt
 package com.app.tripup.presentation.mainFlow.itinerary.itineraryMain
 
 import com.app.tripup.data.local.entities.Itinerary

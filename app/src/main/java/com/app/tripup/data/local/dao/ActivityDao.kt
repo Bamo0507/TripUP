@@ -13,4 +13,8 @@ interface ActivityDao {
 
     @Delete
     suspend fun deleteActivity(activity: Activity)
+
+    @Query("SELECT COUNT(*) FROM Activities WHERE dayItineraryId = :dayItineraryId")
+    suspend fun getActivityCountForDay(dayItineraryId: Int): Int
+
 }

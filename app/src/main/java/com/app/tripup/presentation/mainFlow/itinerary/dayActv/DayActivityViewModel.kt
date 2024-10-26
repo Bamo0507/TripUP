@@ -1,4 +1,3 @@
-// DayActivityViewModel.kt
 package com.app.tripup.presentation.mainFlow.itinerary.dayActv
 
 import androidx.lifecycle.ViewModel

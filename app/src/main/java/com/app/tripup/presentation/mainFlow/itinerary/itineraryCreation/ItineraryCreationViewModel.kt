@@ -1,4 +1,3 @@
-// ItineraryCreationViewModel.kt
 package com.app.tripup.presentation.mainFlow.itinerary.itineraryCreation
 
 import android.util.Log

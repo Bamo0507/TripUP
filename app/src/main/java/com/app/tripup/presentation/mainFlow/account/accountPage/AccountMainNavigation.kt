@@ -8,7 +8,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 data object AccountDestination
 
-// AccountNavigation.kt
 fun NavGraphBuilder.accountScreen(
     onLogoutClick: () -> Unit,
     userPreferences: UserPreferences

@@ -1,4 +1,3 @@
-// DayActivityState.kt
 package com.app.tripup.presentation.mainFlow.itinerary.dayActv
 
 import com.app.tripup.data.local.entities.Activity

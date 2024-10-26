@@ -1,4 +1,3 @@
-// DayInfoViewModel.kt
 package com.app.tripup.presentation.mainFlow.itinerary.addInfoDay
 
 import androidx.lifecycle.ViewModel

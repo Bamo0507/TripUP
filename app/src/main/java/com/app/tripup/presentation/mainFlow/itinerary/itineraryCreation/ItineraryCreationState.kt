@@ -1,4 +1,3 @@
-// ItineraryCreationState.kt
 package com.app.tripup.presentation.mainFlow.itinerary.itineraryCreation
 
 data class ItineraryCreationState(

@@ -1,4 +1,3 @@
-// DayActivityScreen.kt
 package com.app.tripup.presentation.mainFlow.itinerary.dayActv
 
 import androidx.compose.foundation.Image
@@ -24,6 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.app.tripup.R
 import com.app.tripup.data.local.DatabaseModule
@@ -48,7 +48,7 @@ fun DayActivityRoute(
     val viewModel: DayActivityViewModel = viewModel(
         factory = DayActivityViewModelFactory(activityRepository)
     )
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     // Iniciamos la carga de datos
     LaunchedEffect(Unit) {

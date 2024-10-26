@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import com.app.tripup.R
 import com.app.tripup.presentation.ui.theme.MyApplicationTheme
 import android.content.res.Configuration
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.app.tripup.domain.UserPreferences
 import com.app.tripup.presentation.LoadingScreen
@@ -41,7 +42,7 @@ fun LoginRoute(
     )
 
     // Escuchar cambios de estado del login
-    val loginState by viewModel.loginState.collectAsState()
+    val loginState by viewModel.loginState.collectAsStateWithLifecycle()
 
     // Si el login es exitoso, ejecutamos la navegación correspondiente
     if (loginState.loginSuccess) {
@@ -59,7 +60,7 @@ fun LoginScreen(
     viewModel: LoginViewModel,
     modifier: Modifier = Modifier
 ) {
-    val loginState by viewModel.loginState.collectAsState()
+    val loginState by viewModel.loginState.collectAsStateWithLifecycle()
 
     // Mostrar la LoadingScreen si el estado está en "isLoading"
     if (loginState.isLoading) {

@@ -32,7 +32,7 @@ class ExploreSpecificViewModel : ViewModel() {
                     it.copy(
                         isLoading = false,
                         places = places,
-                        noResultsMessage = "No se encontraron resultados para \"$query\""
+                        noResultsMessage = "No results were found for  \"$query\""
                     )
                 } else {
                     it.copy(isLoading = false, places = places, noResultsMessage = null)

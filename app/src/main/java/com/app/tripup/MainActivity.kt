@@ -1,4 +1,3 @@
-// MainActivity.kt
 package com.app.tripup
 
 import android.os.Bundle

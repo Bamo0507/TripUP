@@ -82,6 +82,11 @@
     <string name="end_time_example_2">22:00 PM</string>
     <string name="activity_save">Save Activity</string>
 
+    <!-- Splash Screen -->
+    <string name="splash_screen_title">TripUp</string>
+
+    <string name="splash_screen_subtitle">Where planning meets adventure</string>
+
 
     <string name="no_activities">There are no activities!!</string>
     <string name="no_results_found">No results were found for </string>

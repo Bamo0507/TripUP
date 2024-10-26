@@ -1,4 +1,3 @@
-// ItinerarySelectionNavigation.kt
 package com.app.tripup.presentation.mainFlow.itinerary.itinerarySelection
 
 import androidx.navigation.NavController

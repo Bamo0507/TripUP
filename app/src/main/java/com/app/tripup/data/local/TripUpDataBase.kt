@@ -1,4 +1,3 @@
-// TripUpDatabase.kt
 package com.app.tripup.data.local
 
 import androidx.room.Database

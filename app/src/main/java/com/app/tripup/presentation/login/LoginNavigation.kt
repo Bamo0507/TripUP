@@ -1,4 +1,3 @@
-// LoginNavigation.kt
 package com.app.tripup.presentation.login
 
 import androidx.compose.runtime.Composable

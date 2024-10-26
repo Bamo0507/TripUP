@@ -1,4 +1,3 @@
-// ItineraryDao.kt
 package com.app.tripup.data.local.dao
 
 import androidx.room.*

@@ -1,4 +1,3 @@
-// SplashNavigation.kt
 package com.app.tripup.presentation.splash
 
 import androidx.navigation.NavController

@@ -1,4 +1,3 @@
-// AppNavigation.kt
 package com.app.tripup.presentation.navigation
 
 import androidx.compose.runtime.Composable

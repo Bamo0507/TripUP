@@ -1,4 +1,3 @@
-// DataStoreUserPreferences.kt
 package com.app.tripup.data
 
 import android.content.Context
