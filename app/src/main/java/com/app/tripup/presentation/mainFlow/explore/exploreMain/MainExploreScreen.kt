@@ -1,6 +1,8 @@
 package com.app.tripup.presentation.mainFlow.explore.exploreMain
 
+import android.content.Context
 import android.content.res.Configuration
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -16,6 +18,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.*
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -26,36 +30,153 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.app.tripup.R
 import com.app.tripup.data.model.Place
 import com.app.tripup.data.model.PlaceCategory
-import com.app.tripup.data.source.PlaceDb
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import com.app.tripup.presentation.ui.theme.MyApplicationTheme
+import kotlinx.coroutines.withContext
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
+import android.util.Log
+import com.google.android.gms.location.LocationServices
+import android.location.Geocoder
+import java.util.Locale
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import com.google.android.gms.location.Priority
+import kotlinx.coroutines.tasks.await
+import java.io.IOException
+
 
 @Composable
 fun MainExploreRoute(
     viewModel: MainExploreViewModel = viewModel(),
-    onPlaceClick: (Int) -> Unit,
-    onNavigateToSpecific: (String) -> Unit // Agregar este parámetro para la búsqueda
+    onPlaceClick: (Place) -> Unit,
+    onNavigateToSpecific: (String) -> Unit
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+
+    // Estado para almacenar el país actual
+    var currentCountry by remember { mutableStateOf<String?>(null) }
+
+    // Estado para controlar si ya hemos solicitado permisos
+    var hasRequestedPermission by remember { mutableStateOf(false) }
+
+    val locationPermission = Manifest.permission.ACCESS_FINE_LOCATION
+
+    val permissionGranted = remember {
+        mutableStateOf(
+            ContextCompat.checkSelfPermission(
+                context,
+                locationPermission
+            ) == PackageManager.PERMISSION_GRANTED
+        )
+    }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted ->
+            permissionGranted.value = isGranted
+        }
+    )
+
+    // Si el permiso no está concedido, solicitarlo
+    if (!permissionGranted.value && !hasRequestedPermission) {
+        SideEffect {
+            permissionLauncher.launch(locationPermission)
+            hasRequestedPermission = true
+        }
+    }
+
+    // Obtener la ubicación y el país actual cuando se conceda el permiso
+    LaunchedEffect(permissionGranted.value) {
+        if (permissionGranted.value) {
+            val country = getCurrentCountry(context)
+            currentCountry = country
+            if (country != null) {
+                viewModel.loadPlacesForCountry(country)
+            } else {
+                // Si no se pudo obtener el país, cargar una lista vacía
+                viewModel.loadPlacesForCountry("") // Esto cargará una lista vacía
+            }
+        } else {
+            // Si no se concede el permiso, cargar una lista vacía
+            viewModel.loadPlacesForCountry("") // Esto cargará una lista vacía
+        }
+    }
 
     ExploreScreen(
         state = state,
         onPlaceClick = onPlaceClick,
         onSearch = { query ->
             viewModel.onSearchQuerySubmitted(query) {
-                onNavigateToSpecific(it) // Redirigir a ExploreSpecificScreen con el término de búsqueda
+                onNavigateToSpecific(it)
             }
         }
     )
 }
 
 
+suspend fun getCurrentCountry(context: Context): String? {
+    return withContext(Dispatchers.IO) {
+        try {
+            val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+            val location = fusedLocationClient.lastLocation.await()
+
+            val finalLocation = location ?: run {
+                // Solicitar una única actualización de ubicación
+                val cancellationTokenSource = com.google.android.gms.tasks.CancellationTokenSource()
+                val currentLocation = fusedLocationClient.getCurrentLocation(
+                    Priority.PRIORITY_HIGH_ACCURACY,
+                    cancellationTokenSource.token
+                ).await()
+                // Limpiar el CancellationTokenSource después de usarlo
+                cancellationTokenSource.cancel()
+                currentLocation
+            }
+
+            if (finalLocation != null) {
+                // Verificar si Geocoder está presente en el dispositivo
+                if (Geocoder.isPresent()) {
+                    val geocoder = Geocoder(context, Locale.getDefault())
+                    val addresses = geocoder.getFromLocation(finalLocation.latitude, finalLocation.longitude, 1)
+                    if (addresses?.isNotEmpty() == true) {
+                        addresses[0].countryName
+                    } else null
+                } else {
+                    Log.e("GeocoderError", "Geocoder not available on this device")
+                    null
+                }
+            } else {
+                Log.e("LocationError", "Location is null")
+                null
+            }
+        } catch (e: SecurityException) {
+            Log.e("LocationError", "Location permission not granted", e)
+            null
+        } catch (e: IOException) {
+            Log.e("GeocoderError", "Geocoding failed", e)
+            null
+        } catch (e: Exception) {
+            Log.e("LocationError", "Error getting location", e)
+            null
+        }
+    }
+}
+
+
+
 @Composable
 fun ExploreScreen(
     state: MainExploreState,
-    onPlaceClick: (Int) -> Unit,
-    onSearch: (String) -> Unit // Agregamos el evento de búsqueda
-) {
+    onPlaceClick: (Place) -> Unit, // Cambiado a Place en lugar de Int
+    onSearch: (String) -> Unit
+){
     var query by remember { mutableStateOf("") }
 
     Scaffold { innerPadding ->
@@ -64,11 +185,11 @@ fun ExploreScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            // Barra de búsqueda con el evento de búsqueda
+            // Barra de búsqueda
             SearchBar(
                 query = query,
                 onQueryChange = { query = it },
-                onSearch = { onSearch(query) } // Llamamos a la búsqueda cuando se presiona "Enter" o se hace clic
+                onSearch = { onSearch(query) }
             )
 
             // Mensaje de "Explora cerca de ti"
@@ -85,41 +206,68 @@ fun ExploreScreen(
                 )
             }
 
-            LazyColumn {
-                val groupedPlaces = state.data.groupBy { it.category }
-                groupedPlaces.forEach { (category, placeList) ->
-                    item {
-                        Text(
-                            text = when (category) {
-                                PlaceCategory.RESTAURANTS -> stringResource(id = R.string.category_restaurants)
-                                PlaceCategory.HOTELS -> stringResource(id = R.string.category_hotels)
-                                PlaceCategory.DRINKS -> stringResource(id = R.string.category_drinks)
-                                PlaceCategory.ACTIVITIES -> stringResource(id = R.string.category_activities)
-                            },
-                            style = MaterialTheme.typography.headlineSmall,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp)
-                        )
-                        LazyRow(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            contentPadding = PaddingValues(horizontal = 16.dp)
-                        ) {
-                            items(placeList) { place ->
-                                PlaceCard(
-                                    place,
-                                    onClick = { onPlaceClick(place.id) },
-                                    modifier = Modifier.width(200.dp)
-                                )
+            if (state.isLoading) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            } else if (state.data.isEmpty()) {
+                // Mostrar imagen de respaldo
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.notfound), // Reemplaza con tu imagen de respaldo
+                        contentDescription = null,
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier.size(250.dp)
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = stringResource(id = R.string.no_places_near_you),
+                        style = MaterialTheme.typography.titleMedium,
+                        textAlign = TextAlign.Center,
+                    )
+                }
+            } else {
+                // Mostrar la lista de lugares
+                LazyColumn {
+                    val groupedPlaces = state.data.groupBy { it.categoryEnum }
+                    groupedPlaces.forEach { (category, placeList) ->
+                        item {
+                            Text(
+                                text = when (category) {
+                                    PlaceCategory.RESTAURANTS -> stringResource(id = R.string.category_restaurants)
+                                    PlaceCategory.HOTELS -> stringResource(id = R.string.category_hotels)
+                                    PlaceCategory.DRINKS -> stringResource(id = R.string.category_drinks)
+                                    PlaceCategory.ACTIVITIES -> stringResource(id = R.string.category_activities)
+                                },
+                                style = MaterialTheme.typography.headlineSmall,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp)
+                            )
+                            LazyRow(
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                contentPadding = PaddingValues(horizontal = 16.dp)
+                            ) {
+                                items(placeList) { place ->
+                                    PlaceCard(
+                                        place,
+                                        onClick = { onPlaceClick(place) },
+                                        modifier = Modifier.width(200.dp)
+                                    )
+                                }
                             }
                         }
-
                     }
                 }
             }
         }
     }
 }
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -176,24 +324,32 @@ fun SearchBar(
 
 @Composable
 fun PlaceCard(place: Place, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    val backgroundColor = when (place.category) {
-        PlaceCategory.RESTAURANTS -> MaterialTheme.colorScheme.primary
-        PlaceCategory.HOTELS -> MaterialTheme.colorScheme.secondary
-        PlaceCategory.DRINKS -> MaterialTheme.colorScheme.tertiary
-        PlaceCategory.ACTIVITIES -> MaterialTheme.colorScheme.surfaceVariant
-    }
-
     Card(
         shape = RoundedCornerShape(8.dp),
         modifier = modifier
             .size(200.dp)
             .padding(8.dp)
-            .clickable(onClick = onClick), // Manejar clic aquí
-        colors = CardDefaults.cardColors(containerColor = backgroundColor)
+            .clickable(onClick = onClick),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
+            if (place.imageUrl.isNotEmpty()) {
+                AsyncImage(
+                    model = place.imageUrl,
+                    contentDescription = place.name,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
+            } else {
+                // Si no hay imagen, mostrar un color de fondo o imagen de respaldo
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                )
+            }
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -220,60 +376,3 @@ fun PlaceCard(place: Place, onClick: () -> Unit, modifier: Modifier = Modifier) 
 
 
 
-@Preview(showBackground = true)
-@Composable
-fun ExploreScreenPreview() {
-    MyApplicationTheme {
-        val sampleState = MainExploreState(
-            isLoading = false,
-            data = listOf(
-                Place(
-                    id = 1,
-                    name = "Place 1",
-                    location = "Location 1",
-                    imageUrl = "",
-                    description = "Description of Place 1",
-                    category = PlaceCategory.RESTAURANTS
-                ),
-                Place(
-                    id = 2,
-                    name = "Place 2",
-                    location = "Location 2",
-                    imageUrl = "",
-                    description = "Description of Place 2",
-                    category = PlaceCategory.HOTELS
-                )
-            )
-        )
-        ExploreScreen(state = sampleState, onPlaceClick = {}, onSearch = {})
-    }
-}
-
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-fun ExploreScreenPreviewDark() {
-    MyApplicationTheme {
-        val sampleState = MainExploreState(
-            isLoading = false,
-            data = listOf(
-                Place(
-                    id = 1,
-                    name = "Place 1",
-                    location = "Location 1",
-                    imageUrl = "",
-                    description = "Description of Place 1",
-                    category = PlaceCategory.RESTAURANTS
-                ),
-                Place(
-                    id = 2,
-                    name = "Place 2",
-                    location = "Location 2",
-                    imageUrl = "",
-                    description = "Description of Place 2",
-                    category = PlaceCategory.HOTELS
-                )
-            )
-        )
-        ExploreScreen(state = sampleState, onPlaceClick = {}, onSearch = {})
-    }
-}

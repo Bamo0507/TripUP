@@ -5,11 +5,20 @@ enum class PlaceCategory {
 }
 
 data class Place(
-    val id: Int,
-    val name: String,
-    val location: String,
-    val imageUrl: String,
-    val description: String,
-    val category: PlaceCategory,
-    val isFavorite: Boolean = false // Para indicar si el lugar ha sido marcado como favorito
-)
+    val id: Int = 0,
+    val name: String = "",
+    val location: String = "",
+    val imageUrl: String = "",
+    val description: String = "",
+    val category: String = "",
+    val country: String = "" // Nuevo campo
+) {
+    val categoryEnum: PlaceCategory
+        get() = when (category.uppercase()) {
+            "RESTAURANTS" -> PlaceCategory.RESTAURANTS
+            "HOTELS" -> PlaceCategory.HOTELS
+            "DRINKS" -> PlaceCategory.DRINKS
+            "ACTIVITIES" -> PlaceCategory.ACTIVITIES
+            else -> PlaceCategory.ACTIVITIES
+        }
+}

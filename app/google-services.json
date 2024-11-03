@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "795766976889",
+    "project_id": "tripupapp",
+    "storage_bucket": "tripupapp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:795766976889:android:b5117a7e6b6ead88293fa8",
+        "android_client_info": {
+          "package_name": "com.app.tripup"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBmgIB3hTngh6oChpppnfBKEX3B4bFTZ-U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

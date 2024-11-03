@@ -23,16 +23,16 @@ import androidx.compose.ui.unit.*
 import com.app.tripup.R
 import com.app.tripup.data.model.Place
 import com.app.tripup.data.model.PlaceCategory
-import com.app.tripup.data.source.PlaceDb
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.AsyncImage
 import com.app.tripup.presentation.ui.theme.MyApplicationTheme
 
 @Composable
 fun ExploreSpecificRoute(
     query: String,
     viewModel: ExploreSpecificViewModel = viewModel(),
-    onPlaceClick: (Int) -> Unit,
+    onPlaceClick: (Place) -> Unit,
     onBackClick: () -> Unit
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -57,14 +57,18 @@ fun ExploreSpecificScreen(
     query: String,
     state: ExploreSpecificState,
     onBackClick: () -> Unit = {},
-    onPlaceClick: (Int) -> Unit = {}
+    onPlaceClick: (Place) -> Unit = {}
 ) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = query, fontWeight = FontWeight.Bold,
-                    maxLines = 1, overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.padding(end = 6.dp)) },
+                title = { Text(
+                    text = query,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(end = 6.dp)
+                ) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(
@@ -96,7 +100,7 @@ fun ExploreSpecificScreen(
 
                 state.places.isNotEmpty() -> {
                     LazyColumn {
-                        val groupedPlaces = state.places.groupBy { it.category }
+                        val groupedPlaces = state.places.groupBy { it.categoryEnum } // Cambio aquí
                         groupedPlaces.forEach { (category, placeList) ->
                             item {
                                 Text(
@@ -118,7 +122,7 @@ fun ExploreSpecificScreen(
                                     items(placeList) { place ->
                                         PlaceCard(
                                             place = place,
-                                            onClick = { onPlaceClick(place.id) }
+                                            onClick = { onPlaceClick(place) }
                                         )
                                     }
                                 }
@@ -158,24 +162,31 @@ fun ExploreSpecificScreen(
 
 @Composable
 fun PlaceCard(place: Place, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    val backgroundColor = when (place.category) {
-        PlaceCategory.RESTAURANTS -> MaterialTheme.colorScheme.primary
-        PlaceCategory.HOTELS -> MaterialTheme.colorScheme.secondary
-        PlaceCategory.DRINKS -> MaterialTheme.colorScheme.tertiary
-        PlaceCategory.ACTIVITIES -> MaterialTheme.colorScheme.surfaceVariant
-    }
-
     Card(
         shape = RoundedCornerShape(8.dp),
         modifier = modifier
             .size(200.dp)
             .padding(8.dp)
-            .clickable(onClick = onClick), // Manejar clic aquí
-        colors = CardDefaults.cardColors(containerColor = backgroundColor)
+            .clickable(onClick = onClick),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
+            if (place.imageUrl.isNotEmpty()) {
+                AsyncImage(
+                    model = place.imageUrl,
+                    contentDescription = place.name,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
+            } else {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                )
+            }
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -201,121 +212,5 @@ fun PlaceCard(place: Place, onClick: () -> Unit, modifier: Modifier = Modifier) 
                 }
             }
         }
-    }
-}
-@Preview(showBackground = true)
-@Composable
-fun ExploreSpecificScreenPreview() {
-    MyApplicationTheme {
-        // Simulación de un estado con resultados
-        val sampleState = ExploreSpecificState(
-            isLoading = false,
-            places = listOf(
-                Place(
-                    id = 1,
-                    name = "Hotel Guatemala",
-                    location = "Guatemala City",
-                    imageUrl = "",
-                    description = "Un hotel espectacular en Guatemala",
-                    category = PlaceCategory.HOTELS,
-                    isFavorite = false
-                ),
-                Place(
-                    id = 2,
-                    name = "Restaurante Antigua",
-                    location = "Antigua, Guatemala",
-                    imageUrl = "",
-                    description = "Un restaurante con comida tradicional guatemalteca",
-                    category = PlaceCategory.RESTAURANTS,
-                    isFavorite = true
-                )
-            ),
-            noResultsMessage = null
-        )
-        ExploreSpecificScreen(
-            state = sampleState,
-            onBackClick = {},
-            onPlaceClick = {},
-            query = "hola"
-
-        )
-    }
-}
-
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-fun ExploreSpecificScreenDarkPreview() {
-    MyApplicationTheme(darkTheme = true) {
-        // Simulación de un estado con resultados en modo oscuro
-        val sampleState = ExploreSpecificState(
-            isLoading = false,
-            places = listOf(
-                Place(
-                    id = 1,
-                    name = "Hotel Guatemala",
-                    location = "Guatemala City",
-                    imageUrl = "",
-                    description = "Un hotel espectacular en Guatemala",
-                    category = PlaceCategory.HOTELS,
-                    isFavorite = false
-                ),
-                Place(
-                    id = 2,
-                    name = "Restaurante Antigua",
-                    location = "Antigua, Guatemala",
-                    imageUrl = "",
-                    description = "Un restaurante con comida tradicional guatemalteca",
-                    category = PlaceCategory.RESTAURANTS,
-                    isFavorite = true
-                )
-            ),
-            noResultsMessage = null
-        )
-        ExploreSpecificScreen(
-            state = sampleState,
-            onBackClick = {},
-            onPlaceClick = {},
-            query = "hola"
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun ExploreSpecificScreenNoResultsPreview() {
-    MyApplicationTheme {
-        // Simulación de un estado sin resultados
-        val sampleState = ExploreSpecificState(
-            isLoading = false,
-            places = emptyList(),
-            noResultsMessage = "No se encontraron resultados para tu búsqueda"
-        )
-        ExploreSpecificScreen(
-            state = sampleState,
-            onBackClick = {},
-            onPlaceClick = {},
-            query = "hola"
-
-        )
-    }
-}
-
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-fun ExploreSpecificScreenNoResultsDarkPreview() {
-    MyApplicationTheme(darkTheme = true) {
-        // Simulación de un estado sin resultados en modo oscuro
-        val sampleState = ExploreSpecificState(
-            isLoading = false,
-            places = emptyList(),
-            noResultsMessage = "No se encontraron resultados para tu búsqueda"
-        )
-        ExploreSpecificScreen(
-            state = sampleState,
-            onBackClick = {},
-            onPlaceClick = {},
-            query = "hola"
-
-        )
     }
 }

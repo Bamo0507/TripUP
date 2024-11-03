@@ -13,6 +13,7 @@ kotlinSerialization = "1.6.3"
 dataStore = "1.1.1"
 splashScreen = "1.0.1"
 room = "2.6.1"
+playServicesLocation = "21.3.0"
 
 
 [libraries]
@@ -38,6 +39,7 @@ androidx-splashscreen = { group = "androidx.core", name = "core-splashscreen", v
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room"}
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room"}
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
+play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

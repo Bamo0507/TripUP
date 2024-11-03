@@ -25,13 +25,14 @@ fun NavGraphBuilder.exploreGraph(
         //Pantalla principal
         mainExploreScreen(
             onPlaceCardClick = { place ->
-                //AQUÍ METO LA LÓGICA YA CUANDO TENGA EL LOCATION INFO
                 navController.navigateToLocationInfoScreen(
-                    destination = LocationInfoDestination(placeId = place,
-                        isSearchResult = false)
+                    destination = LocationInfoDestination(
+                        placeId = place.id,
+                        countryName = place.country
+                    )
                 )
             },
-            onNavigateToSpecific = {query ->
+            onNavigateToSpecific = { query ->
                 navController.navigateToSpecificScreen(
                     destination = EspecficExploreDestination(searchName = query)
                 )
@@ -47,14 +48,18 @@ fun NavGraphBuilder.exploreGraph(
         specificScreen(
             onPlaceClick = { place ->
                 navController.navigateToLocationInfoScreen(
-                    destination = LocationInfoDestination(placeId = place,
-                        isSearchResult = true)
+                    destination = LocationInfoDestination(
+                        placeId = place.id,
+                        countryName = place.country
+                    )
                 )
             },
             onBackClick = {
                 navController.navigateUp()
             }
         )
+
+
 
     }
 }

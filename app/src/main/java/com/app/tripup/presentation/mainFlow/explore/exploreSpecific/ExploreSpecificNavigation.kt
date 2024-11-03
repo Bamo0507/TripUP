@@ -5,6 +5,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import com.app.tripup.data.model.Place
 import com.app.tripup.presentation.mainFlow.explore.locationInfo.LocationInfoDestination
 import kotlinx.serialization.Serializable
 
@@ -26,17 +27,16 @@ fun NavController.navigateToSpecificScreen(
 
 fun NavGraphBuilder.specificScreen(
     onBackClick: () -> Unit,
-    onPlaceClick: (Int) -> Unit
+    onPlaceClick: (Place) -> Unit
 ){
-    composable<EspecficExploreDestination>{backStackEntry ->
+    composable<EspecficExploreDestination>{ backStackEntry ->
         val destination: EspecficExploreDestination = backStackEntry.toRoute()
 
         ExploreSpecificRoute(
             onBackClick = onBackClick,
             onPlaceClick = onPlaceClick,
-            //falta manejo de query,
             query = destination.searchName
-
         )
     }
 }
+

@@ -3,9 +3,7 @@ package com.app.tripup.presentation.mainFlow.explore.locationInfo
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.app.tripup.data.model.Place
-import com.app.tripup.data.source.PlaceDb
-import com.app.tripup.data.source.SearchPlaceDb
+import com.app.tripup.data.repository.FirebasePlaceRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -14,40 +12,33 @@ class LocationInfoViewModel(
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    // Bases de datos simuladas
-    private val placeDb = PlaceDb()
-    private val searchPlaceDb = SearchPlaceDb()
+    private val repository = FirebasePlaceRepository()
 
-    // Estado mutable observado por la UI
     private val _uiState = MutableStateFlow(LocationInfoState())
     val uiState = _uiState.asStateFlow()
 
     init {
         val placeId = savedStateHandle.get<Int>("placeId")
-        val fromSearchDb = savedStateHandle.get<Boolean>("fromSearchDb") ?: false // Valor por defecto en caso de que no se proporcione
-
-        // Verificamos si el placeId es válido antes de proceder
-        if (placeId != null) {
-            loadPlaceInfo(placeId, fromSearchDb) // Ahora pasamos ambos parámetros
+        val countryName = savedStateHandle.get<String>("countryName")
+        if (placeId != null && countryName != null) {
+            loadPlaceInfo(placeId, countryName)
         } else {
-            // Si el placeId es nulo, manejamos el error
             _uiState.value = _uiState.value.copy(
                 place = null,
-                errorMessage = "Invalid place ID"
+                errorMessage = "Datos de lugar inválidos"
             )
         }
     }
 
-
-    // Función para cargar la información de un lugar
-    fun loadPlaceInfo(placeId: Int, fromSearchDb: Boolean) {
+    fun loadPlaceInfo(placeId: Int, countryName: String) {
         viewModelScope.launch {
-            val place = if (fromSearchDb) {
-                searchPlaceDb.getPlaceById(placeId)
-            } else {
-                placeDb.getPlaceById(placeId)
+            _uiState.value = _uiState.value.copy(isLoading = true)
+            try {
+                val place = repository.getPlaceByIdAndCountry(placeId, countryName)
+                _uiState.value = _uiState.value.copy(place = place, isLoading = false)
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(place = null, errorMessage = "Error al cargar el lugar", isLoading = false)
             }
-            _uiState.value = _uiState.value.copy(place = place)
         }
     }
 }

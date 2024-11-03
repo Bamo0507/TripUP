@@ -11,6 +11,7 @@ import androidx.navigation.compose.rememberNavController
 import com.app.tripup.data.DataStoreUserPreferences
 import com.app.tripup.presentation.navigation.AppNavigation
 import com.app.tripup.presentation.ui.theme.MyApplicationTheme
+import com.google.firebase.FirebaseApp
 
 class MainActivity : ComponentActivity() {
 
@@ -20,8 +21,10 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        FirebaseApp.initializeApp(this)
         setContent {
             val navController = rememberNavController()
+
             MyApplicationTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     AppNavigation(

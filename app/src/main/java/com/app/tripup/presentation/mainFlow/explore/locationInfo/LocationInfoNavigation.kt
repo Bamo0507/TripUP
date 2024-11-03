@@ -10,14 +10,13 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class LocationInfoDestination(
     val placeId: Int,
-    val isSearchResult: Boolean = false,
+    val countryName: String
 )
-
 
 fun NavController.navigateToLocationInfoScreen(
     destination: LocationInfoDestination,
     navOptions: NavOptions? = null
-){
+) {
     this.navigate(
         destination,
         navOptions
@@ -25,12 +24,12 @@ fun NavController.navigateToLocationInfoScreen(
 }
 
 fun NavGraphBuilder.locationInfoScreen(onBackClick: () -> Unit){
-    composable<LocationInfoDestination>{backStackEntry ->
+    composable<LocationInfoDestination>{ backStackEntry ->
         val destination: LocationInfoDestination = backStackEntry.toRoute()
-        LocationInfoRoute(onNavigateBack = onBackClick,
+        LocationInfoRoute(
             placeId = destination.placeId,
-            fromSearchDb = destination.isSearchResult
+            countryName = destination.countryName,
+            onNavigateBack = onBackClick
         )
-
     }
 }

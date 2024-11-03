@@ -3,40 +3,38 @@ package com.app.tripup.presentation.mainFlow.explore.exploreMain
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.app.tripup.data.source.PlaceDb
+import com.app.tripup.data.model.Place
+import com.app.tripup.data.repository.FirebasePlaceRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import android.util.Log
 
-class MainExploreViewModel(
-    savedStateHandle: SavedStateHandle
-): ViewModel() {
+class MainExploreViewModel : ViewModel() {
 
-    private val placeDb = PlaceDb()
+    private val repository = FirebasePlaceRepository()
 
-    private val _uiState = MutableStateFlow(MainExploreState(isLoading = true)) // Inicializamos isLoading como true
+    private val _uiState = MutableStateFlow(MainExploreState(isLoading = true))
     val uiState = _uiState.asStateFlow()
 
-    init {
-        loadPlaces() // Cargamos los lugares al inicializar el ViewModel
-    }
-
-    fun loadPlaces() {
+    fun loadPlacesForCountry(countryName: String) {
         viewModelScope.launch {
-            // Simulación de cargar lugares (puedes añadir una pausa aquí si es necesario)
-            val places = placeDb.getAllPlaces()
-
-            // Actualizamos el estado con los datos cargados
-            _uiState.update {
-                it.copy(isLoading = false, data = places)
+            try {
+                val places = repository.getPlacesByCountry(countryName)
+                _uiState.update {
+                    it.copy(isLoading = false, data = places)
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(isLoading = false, data = emptyList())
+                }
+                Log.e("MainExploreViewModel", "Error loading places", e)
             }
         }
     }
 
     fun onSearchQuerySubmitted(query: String, onSearchComplete: (String) -> Unit) {
-        // Aquí se puede realizar una búsqueda si tienes un sistema de filtrado en tu base de datos
-        onSearchComplete(query) // Redirige al `ExploreSpecificScreen` con el término de búsqueda
+        onSearchComplete(query)
     }
-
 }
