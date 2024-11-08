@@ -1,7 +1,9 @@
 package com.app.tripup.presentation.mainFlow.account.accountPage
 
 import android.content.res.Configuration
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -28,7 +30,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,9 +48,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.app.tripup.R
 import com.app.tripup.domain.UserPreferences
 import com.app.tripup.presentation.ui.theme.MyApplicationTheme
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 @Composable
@@ -51,7 +61,23 @@ fun AccountRoute(
     onLogoutClick: () -> Unit,
     userPreferences: UserPreferences
 ) {
-    AccountScreen(onLogoutClick = onLogoutClick, userPreferences = userPreferences)
+    val viewModel: AccountMainViewModel = viewModel(
+        factory = AccountMainViewModel.Factory(userPreferences)
+    )
+
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    AccountScreen(
+        onLogoutClick = {
+            viewModel.onLogoutClick()
+            onLogoutClick()
+        },
+        onAvatarClick = {
+            viewModel.onAvatarClick()
+        },
+        userName = uiState.userName,
+        currentAvatarIndex = uiState.currentAvatarIndex
+    )
 }
 
 
@@ -59,22 +85,20 @@ fun AccountRoute(
 @Composable
 fun AccountScreen(
     onLogoutClick: () -> Unit,
-    userPreferences: UserPreferences,
-    userName: String = "Usuario"
+    onAvatarClick: () -> Unit,
+    userName: String,
+    currentAvatarIndex: Int
 ) {
-    val coroutineScope = rememberCoroutineScope()
-
     Scaffold { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            // Fondo de la Ciudad con Avatar del Usuario
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp) // Aumentar altura para mejorar la estética
+                    .height(200.dp)
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.citytemplate),
@@ -89,19 +113,22 @@ fun AccountScreen(
                         .offset(y = 70.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    // Imagen del Avatar
-                    Image(
-                        painter = painterResource(id = R.drawable.user_avatar),
-                        contentDescription = "User Avatar",
-                        modifier = Modifier
-                            .size(150.dp)
-                            .clip(CircleShape)
-                            .border(2.dp, Color.White, CircleShape)
-                    )
-                    // Nombre del Usuario
+                    Crossfade(targetState = currentAvatarIndex) { avatarIndex ->
+                        Image(
+                            painter = painterResource(id = getAvatarResourceId(avatarIndex)),
+                            contentDescription = "User Avatar",
+                            modifier = Modifier
+                                .size(150.dp)
+                                .clip(CircleShape)
+                                .border(2.dp, Color.White, CircleShape)
+                                .clickable {
+                                    onAvatarClick()
+                                }
+                        )
+                    }
                     Text(
                         text = userName,
-                        style = MaterialTheme.typography.headlineSmall,
+                        style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.padding(top = 8.dp)
@@ -111,29 +138,25 @@ fun AccountScreen(
 
             Spacer(modifier = Modifier.height(68.dp))
 
-            // Opciones de la Cuenta
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(horizontal = 24.dp, vertical = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-
-                // Opción de Log Out
                 AccountOption(
                     icon = Icons.Default.ExitToApp,
                     label = stringResource(id = R.string.logout),
                     iconTint = MaterialTheme.colorScheme.primary
                 ) {
-                    coroutineScope.launch {
-                        userPreferences.setLoggedIn(false)
-                        onLogoutClick()
-                    }
+                    onLogoutClick()
                 }
             }
         }
     }
 }
+
+
 @Composable
 fun AccountOption(
     icon: ImageVector,
@@ -173,4 +196,18 @@ fun AccountOption(
     }
 
 }
+
+//FUNCIÓN PARA PODER JALAR CUALQUIERA DE LOS AVATARS :)
+fun getAvatarResourceId(avatarIndex: Int): Int {
+    return when (avatarIndex) {
+        1 -> R.drawable.avatar1
+        2 -> R.drawable.avatar2
+        3 -> R.drawable.avatar3
+        4 -> R.drawable.avatar4
+        5 -> R.drawable.avatar5
+        6 -> R.drawable.avatar6
+        else -> R.drawable.avatar1 // Valor por defecto
+    }
+}
+
 

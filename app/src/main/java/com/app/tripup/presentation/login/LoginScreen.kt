@@ -27,29 +27,38 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.app.tripup.domain.UserPreferences
 import com.app.tripup.presentation.LoadingScreen
 import com.app.tripup.presentation.login.LoginViewModel.Companion.Factory
+import android.app.Activity
+import android.content.Intent
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.ui.platform.LocalContext
+import com.google.android.gms.auth.api.signin.*
+import com.google.android.gms.common.api.ApiException
+import com.google.firebase.auth.*
+import kotlinx.coroutines.tasks.await
 
 @Composable
 fun LoginRoute(
     onLoginSuccess: () -> Unit,
     userPreferences: UserPreferences
 ) {
-    // Crear una instancia del ViewModel utilizando el Factory
     val viewModel: LoginViewModel = viewModel(
-        factory = Factory(
-            loginRepository = LocalLoginRepository(),
+        factory = LoginViewModel.Companion.Factory(
+            loginRepository = FirebaseLoginRepository(),
             userPreferences = userPreferences
         )
     )
 
-    // Escuchar cambios de estado del login
     val loginState by viewModel.loginState.collectAsStateWithLifecycle()
 
-    // Si el login es exitoso, ejecutamos la navegación correspondiente
-    if (loginState.loginSuccess) {
-        onLoginSuccess()
+    // Maneja la navegación de forma diferida
+    LaunchedEffect(loginState.loginSuccess) {
+        if (loginState.loginSuccess) {
+            onLoginSuccess()
+        }
     }
 
-    // Pasar el ViewModel a la pantalla
     LoginScreen(viewModel = viewModel)
 }
 
@@ -86,20 +95,20 @@ fun LoginScreen(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Campo de texto para el usuario
+                // Campo de texto para el correo electrónico
                 OutlinedTextField(
                     value = loginState.email,
                     onValueChange = { viewModel.onLoginEvent(LoginEvent.EmailChanged(it)) },
                     placeholder = {
                         Text(
-                            text = stringResource(id = R.string.signin_user),
+                            text = stringResource(id = R.string.email_placeholder),
                             color = placeholderColor
                         )
                     },
                     leadingIcon = {
                         Icon(
                             Icons.Outlined.Person,
-                            contentDescription = "Persona",
+                            contentDescription = "Email",
                             tint = placeholderColor
                         )
                     },
@@ -157,16 +166,18 @@ fun LoginScreen(
                 // Mostrar mensaje de error si existe
                 if (loginState.showError) {
                     Text(
-                        text = errorMessage,
+                        text = loginState.errorMessage,
                         color = MaterialTheme.colorScheme.error,
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.padding(top = 8.dp)
                     )
                 }
 
+
+
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Botón de Sign-in
+                // Botón de Iniciar Sesión
                 Button(
                     onClick = { viewModel.onLoginEvent(LoginEvent.LoginClick) },
                     modifier = Modifier
@@ -183,9 +194,11 @@ fun LoginScreen(
                     )
                 }
 
-                // Botón de Google Sign-in (sin funcionalidad)
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Botón de Registrarse
                 OutlinedButton(
-                    onClick = { /* TODO */ },
+                    onClick = { viewModel.onLoginEvent(LoginEvent.RegisterClick) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
@@ -193,14 +206,8 @@ fun LoginScreen(
                     border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary),
                     colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary)
                 ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.googlelogo),
-                        contentDescription = "Google Logo",
-                        modifier = Modifier.size(24.dp),
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = stringResource(id = R.string.signup_google),
+                        text = stringResource(id = R.string.signup),
                         color = MaterialTheme.colorScheme.primary,
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Bold

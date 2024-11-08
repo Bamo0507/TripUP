@@ -15,6 +15,7 @@ class DataStoreUserPreferences(private val context: Context) : UserPreferences {
     companion object {
         private val IS_LOGGED_IN = booleanPreferencesKey("is_logged_in")
         private val USER_NAME = stringPreferencesKey("user_name")
+        private val AVATAR_INDEX = intPreferencesKey("avatar_index")
     }
 
     override suspend fun setLoggedIn(isLoggedIn: Boolean) {
@@ -37,7 +38,19 @@ class DataStoreUserPreferences(private val context: Context) : UserPreferences {
 
     override fun getUserName(): Flow<String> {
         return context.dataStore.data.map { preferences ->
-            preferences[USER_NAME] ?: ""
+            preferences[USER_NAME]?.takeIf { it.isNotEmpty() } ?: "Usuario"
+        }
+    }
+
+    override suspend fun setAvatarIndex(avatarIndex: Int) {
+        context.dataStore.edit { preferences ->
+            preferences[AVATAR_INDEX] = avatarIndex
+        }
+    }
+
+    override fun getAvatarIndex(): Flow<Int> {
+        return context.dataStore.data.map { preferences ->
+            preferences[AVATAR_INDEX] ?: 1 // Valor por defecto, que sería el primer avatar (mujer blanca)
         }
     }
 }

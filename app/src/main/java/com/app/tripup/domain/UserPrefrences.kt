@@ -7,4 +7,7 @@ interface UserPreferences {
     fun isLoggedIn(): Flow<Boolean>
     suspend fun setUserName(userName: String)
     fun getUserName(): Flow<String>
+    suspend fun setAvatarIndex(avatarIndex: Int)
+    fun getAvatarIndex(): Flow<Int>
+
 }

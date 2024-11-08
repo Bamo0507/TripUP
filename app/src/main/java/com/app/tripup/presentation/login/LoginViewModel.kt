@@ -1,9 +1,11 @@
 package com.app.tripup.presentation.login
 
+import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.app.tripup.domain.UserPreferences
+import com.google.firebase.auth.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,10 +20,10 @@ class LoginViewModel(
     private val _loginState = MutableStateFlow(LoginState())
     val loginState = _loginState.asStateFlow()
 
-    // Eventos que se tienen que ver reflejados en UI
     fun onLoginEvent(event: LoginEvent) {
         when (event) {
             LoginEvent.LoginClick -> onLogIn()
+            LoginEvent.RegisterClick -> onRegister()
             is LoginEvent.EmailChanged -> onEmailChange(event.newEmail)
             is LoginEvent.PasswordChanged -> onPasswordChange(event.newPassword)
         }
@@ -48,38 +50,129 @@ class LoginViewModel(
     private fun onLogIn() {
         viewModelScope.launch {
             val screenState = _loginState.value
-            if (screenState.password.isEmpty()) {
-                _loginState.update { it.copy(showError = true) }
+            if (screenState.email.isEmpty() || screenState.password.isEmpty()) {
+                _loginState.update { it.copy(showError = true, errorMessage = "Email and Password are required") }
                 return@launch
             }
 
             _loginState.update { it.copy(isLoading = true) }
 
-            delay(4000)
+            try {
+                val loggedStatus = loginRepository.login(screenState.email, screenState.password)
+                if (loggedStatus) {
+                    val username = extractUsernameFromEmail(screenState.email)
+                    userPreferences.setLoggedIn(true)
+                    userPreferences.setUserName(screenState.email)
 
-            val loggedStatus = loginRepository.login(screenState.email, screenState.password)
-            if (loggedStatus) {
-                // Actualizamos UserPreferences
-                userPreferences.setLoggedIn(true)
-                userPreferences.setUserName(screenState.email) // o el nombre de usuario correspondiente
-
-                _loginState.update {
-                    it.copy(
-                        isLoading = false,
-                        showError = false,
-                        loginSuccess = true,
-                        email = "",
-                        password = "",
-                    )
+                    _loginState.update {
+                        it.copy(
+                            isLoading = false,
+                            showError = false,
+                            loginSuccess = true,
+                            email = "",
+                            password = "",
+                        )
+                    }
+                } else {
+                    _loginState.update {
+                        it.copy(
+                            isLoading = false,
+                            showError = true,
+                            errorMessage = "Wrong User or Password"
+                        )
+                    }
                 }
-            } else {
+            } catch (e: Exception) {
                 _loginState.update {
                     it.copy(
                         isLoading = false,
                         showError = true,
+                        errorMessage = "Error Signing in. Please try again."
                     )
                 }
             }
+        }
+    }
+
+    private fun extractUsernameFromEmail(email: String): String {
+        return email.substringBefore("@")
+    }
+
+
+
+    private fun onRegister() {
+        viewModelScope.launch {
+            val screenState = _loginState.value
+            val emailPattern = Patterns.EMAIL_ADDRESS
+
+            if (screenState.email.isEmpty() || screenState.password.isEmpty()) {
+                _loginState.update { it.copy(showError = true, errorMessage = "Email and Password are required") }
+                return@launch
+            }
+
+            if (!emailPattern.matcher(screenState.email).matches()) {
+                _loginState.update { it.copy(showError = true, errorMessage = "Wrong Email Format.") }
+                return@launch
+            }
+
+            if (screenState.password.length < 6) {
+                _loginState.update { it.copy(showError = true, errorMessage = "The Password Must at Least Have 6 Characters.") }
+                return@launch
+            }
+
+            _loginState.update { it.copy(isLoading = true) }
+
+            try {
+                val registerStatus = loginRepository.register(screenState.email, screenState.password)
+                if (registerStatus) {
+                    val username = extractUsernameFromEmail(screenState.email)
+                    userPreferences.setLoggedIn(true)
+                    userPreferences.setUserName(screenState.email)
+
+                    _loginState.update {
+                        it.copy(
+                            isLoading = false,
+                            showError = false,
+                            loginSuccess = true,
+                            email = "",
+                            password = "",
+                        )
+                    }
+                }
+            }catch (e: FirebaseAuthWeakPasswordException) {
+                _loginState.update {
+                    it.copy(
+                        isLoading = false,
+                        showError = true,
+                        errorMessage = "The password is too weak. It must be at least 6 characters long."
+                    )
+                }
+            } catch (e: FirebaseAuthInvalidCredentialsException) {
+                _loginState.update {
+                    it.copy(
+                        isLoading = false,
+                        showError = true,
+                        errorMessage = "The email format is invalid."
+                    )
+                }
+            } catch (e: FirebaseAuthUserCollisionException) {
+                _loginState.update {
+                    it.copy(
+                        isLoading = false,
+                        showError = true,
+                        errorMessage = "An account with this email already exists."
+                    )
+                }
+            } catch (e: Exception) {
+                _loginState.update {
+                    it.copy(
+                        isLoading = false,
+                        showError = true,
+                        errorMessage = "Unknown error. Please try again."
+                    )
+                }
+            }
+
         }
     }
 
@@ -95,7 +188,6 @@ class LoginViewModel(
     }
 
     companion object {
-        // Actualizamos Factory
         class Factory(
             private val loginRepository: LoginRepository,
             private val userPreferences: UserPreferences
@@ -108,3 +200,4 @@ class LoginViewModel(
     }
 
 }
+

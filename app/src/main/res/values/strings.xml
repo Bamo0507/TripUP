@@ -93,6 +93,10 @@
     <string name="no_itineraries">There are no itineraries!</string>
     <string name="no_days">No days found</string>
     <string name="no_places_near_you">No places near you.</string>
-
+    <string name="default_web_client_id">YOUR_CLIENT_ID.apps.googleusercontent.com</string>
     <string name="error_place_not_found">Place not found</string>
+
+    <string name="email_placeholder">Email</string>
+    <string name="signup">Sign Up</string>
+
 </resources>
