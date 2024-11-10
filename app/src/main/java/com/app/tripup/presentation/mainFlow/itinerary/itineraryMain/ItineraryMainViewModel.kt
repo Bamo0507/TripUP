@@ -11,19 +11,23 @@ import kotlinx.coroutines.launch
 class ItineraryMainViewModel(
     private val itineraryRepository: ItineraryRepository
 ) : ViewModel() {
-
+    //Variables para manejar correctamente el state
     private val _uiState = MutableStateFlow(ItineraryMainState())
     val uiState: StateFlow<ItineraryMainState> = _uiState
 
+    //Desde que se genera la instancia cargamos los itinerarios
     init {
         loadItineraries()
     }
 
+    //Función para cargar los itinerarios
     private fun loadItineraries() {
-        viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true)
+        viewModelScope.launch { //tiramos la corrutina
+            _uiState.value = _uiState.value.copy(isLoading = true) //actualizamos el state para que esté en carga
             try {
+                //Obtenemos los itinerarios y actualizamos el state
                 val itineraries = itineraryRepository.getAllItineraries()
+                //Actualizamos el state
                 _uiState.value = _uiState.value.copy(
                     itineraries = itineraries,
                     isLoading = false
@@ -38,6 +42,7 @@ class ItineraryMainViewModel(
     }
 }
 
+//Clase para el factory, para poder generar el viewmodel sin problemas con la inyección de dependencias (Repository) al no ser algo base de los viewmodel
 class ItineraryMainViewModelFactory(
     private val itineraryRepository: ItineraryRepository
 ) : ViewModelProvider.Factory {

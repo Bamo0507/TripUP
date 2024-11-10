@@ -23,10 +23,12 @@ fun AppNavigation(
         startDestination = SplashDestination,
         modifier = modifier
     ) {
+        //Comenzamos lanzando el splashscreen
         splashScreen(navController, userPreferences)
 
         loginScreen(
             onLoginSuccess = {
+                //Una vez loggeado pasamos al main
                 navController.navigate(MainNavigationGraph) {
                     popUpTo(LoginDestination) {
                         inclusive = true
@@ -36,6 +38,7 @@ fun AppNavigation(
             userPreferences = userPreferences
         )
 
+        //Estando en el main navigation graph solo mandamos el logoutclick que se usa en la account page
         mainNavigationGraph(
             userPreferences = userPreferences,
             onLogoutClick = {

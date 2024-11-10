@@ -19,6 +19,7 @@ data class NavItem(
     val destination: Any,
 )
 
+//Se tiene una lista de objetos de la data class que se definió, se declaran las destinations, titulos y iconos
 val navigationItems = listOf(
     NavItem(
         title = "Explore",
@@ -43,6 +44,7 @@ val navigationItems = listOf(
 
 )
 
+//Pantallas donde se debe ver
 val topLevelDestinations = listOf(
     MainExploreDestination::class,
     ItineraryMainDestination::class,

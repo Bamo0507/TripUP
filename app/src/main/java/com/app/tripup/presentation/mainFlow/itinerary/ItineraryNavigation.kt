@@ -35,9 +35,11 @@ fun NavGraphBuilder.itineraryGraph(
     ){
         // Pantalla principal
         itineraryMainScreen(
+            //Mandamos el ID del itinerario seleccionado
             onItinerarySelected = { itineraryId ->
                 navController.navigate(ItinerarySelectionDestination(itineraryId))
             },
+            //Si se crea un itinerario dirigimos a esa pantalla
             onCreateItinerary = {
                 navController.navigate(ItineraryCreationDestination)
             }
@@ -46,12 +48,15 @@ fun NavGraphBuilder.itineraryGraph(
         // Pantalla de creación de itinerarios
         itineraryCreationScreen(
             onItineraryCreated = { itineraryId ->
+                //Si se crea un itinerario dirigimos la pantalla de selección de itinerario pasando de una vez el id generado
                 navController.navigate(ItinerarySelectionDestination(itineraryId.toInt())) {
                     popUpTo(ItineraryMainDestination) {
+                        //Se elimina del backstack la pantalla de creación
                         inclusive = true
                     }
                 }
             },
+            //Regresamos a la pantalla principal
             onBackClick = {
                 navController.navigateUp()
             }
@@ -59,6 +64,7 @@ fun NavGraphBuilder.itineraryGraph(
 
         // Pantalla tras seleccionar itinerario
         itinerarySelectionScreen(
+            //Se manda el título para desplegarlo en la pantalla como el ID para desplegar la info asocaida a esa clave
             onDaySelected = { dayItineraryId, itineraryTitle, date ->
                 navController.navigateToDayActivityScreen(
                     DayActivityDestination(
@@ -68,6 +74,7 @@ fun NavGraphBuilder.itineraryGraph(
                     )
                 )
             },
+            //Regresamos a la pantalla principal
             onBackClick = {
                 navController.navigateUp()
             }
@@ -75,6 +82,7 @@ fun NavGraphBuilder.itineraryGraph(
 
         // Pantalla de las activities
         dayActivityScreen(
+            //Se manda el título para desplegarlo en la pantalla como el ID para desplegar la info asocaida a esa clave
             onAddActivityClick = { dayItineraryId, itineraryTitle, date ->
                 navController.navigateToDayInfoScreen(
                     DayInfoDestination(
@@ -84,6 +92,7 @@ fun NavGraphBuilder.itineraryGraph(
                     )
                 )
             },
+            //Regresamos una pantalla atrás
             onBackClick = {
                 navController.navigateUp()
             }
@@ -91,6 +100,7 @@ fun NavGraphBuilder.itineraryGraph(
 
         // Pantalla de añadir información al día
         dayInfoScreen(
+            //En ambos casos solo debemos regresar una pantalla por si se quiere volver a crear un activity
             onActivityCreated = {
                 navController.navigateUp()
             },

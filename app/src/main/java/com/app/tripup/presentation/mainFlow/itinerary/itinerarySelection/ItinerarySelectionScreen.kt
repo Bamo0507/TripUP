@@ -80,8 +80,8 @@ fun ItinerarySelectionRoute(
     onDaySelected: (Int, String, String) -> Unit,
     onBackClick: () -> Unit
 ) {
+    //Se maneja el context para jalar los daos
     val context = LocalContext.current
-
     // Inicializa los repositorios
     val dayItineraryRepository = DayItineraryRepository(
         DatabaseModule.getDatabase(context).dayItineraryDao()
@@ -107,7 +107,7 @@ fun ItinerarySelectionRoute(
 
     // Carga los días con el conteo de actividades al iniciar la pantalla
     LaunchedEffect(Unit) {
-        viewModel.loadDaysWithActivityCount(itineraryId)
+        viewModel.loadDaysWithActivityCount(itineraryId) //permite tener la información a la mano en la UI
     }
 
     // Llama a la pantalla con los datos actualizados
@@ -182,7 +182,9 @@ fun DayCard(
     activityCount: Int,
     onClick: () -> Unit
 ) {
+    //Se declara el formato de fecha que se quiere
     val formatter = DateTimeFormatter.ofPattern("MMMM d", Locale.getDefault())
+    //Formateamos la date asociada al dayitinerary
     val formattedDate = LocalDate.parse(dayItinerary.date).format(formatter)
 
     Card(
@@ -207,6 +209,7 @@ fun DayCard(
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Bold
             )
+            //Mensaje a mostrar si es 1 o mayor, por la S que se agrega
             Text(text = if(activityCount == 1) "$activityCount Activity" else "$activityCount Activities")
         }
     }

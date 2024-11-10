@@ -95,8 +95,21 @@
     <string name="no_places_near_you">No places near you.</string>
     <string name="default_web_client_id">YOUR_CLIENT_ID.apps.googleusercontent.com</string>
     <string name="error_place_not_found">Place not found</string>
+    <string name="no_results_message">No Results were Found for "%1$s"</string>
 
     <string name="email_placeholder">Email</string>
     <string name="signup">Sign Up</string>
+
+    <!-- Mensajes de Error para el LOGIN -->
+    <string name="not_filled">Email and Password are required</string>
+    <string name="wrong_user_or_password">Wrong User or Password</string>
+    <string name="generic_error">Error Signing in. Please try again.</string>
+
+    <!-- Mensajes de Error para el REGISTER -->
+    <string name="the_password_must_at_least_have_6_characters">The Password Must at Least Have 6 Characters.</string>
+    <string name="the_email_format_is_invalid">Wrong Email Format.</string>
+    <string name="an_account_with_this_email_already_exists">An account with this email already exists.</string>
+    <string name="register_generic_error">Unknown error. Please try again.</string>
+
 
 </resources>

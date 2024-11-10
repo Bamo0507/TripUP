@@ -41,14 +41,20 @@ fun DayActivityRoute(
     onAddActivityClick: (Int, String, String) -> Unit,
     onBackClick: () -> Unit
 ) {
+    //Se obtiene el context y se instancia el repositorio de actividades
     val context = LocalContext.current
     val activityRepository = ActivityRepository(
         DatabaseModule.getDatabase(context).activityDao()
     )
+
+    /*
+    Generamos el viewmodel y creamos la variable que escucara al state
+     */
     val viewModel: DayActivityViewModel = viewModel(
         factory = DayActivityViewModelFactory(activityRepository)
     )
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
 
     // Iniciamos la carga de datos
     LaunchedEffect(Unit) {
@@ -62,6 +68,7 @@ fun DayActivityRoute(
         onAddActivityClick = { onAddActivityClick(dayItineraryId, itineraryTitle, date) },
         onBackClick = onBackClick
     )
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -150,6 +157,7 @@ fun DayActivityScreen(
     }
 }
 
+//Formatear la hora como la necesitamos 8:00-9:00
 fun formatDate(dateString: String): String {
     val formatter = DateTimeFormatter.ofPattern("MMMM d", Locale.getDefault())
     val parsedDate = LocalDate.parse(dateString)

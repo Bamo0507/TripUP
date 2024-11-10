@@ -12,14 +12,18 @@ class DayActivityViewModel(
     private val activityRepository: ActivityRepository
 ) : ViewModel() {
 
+    //Variables para manejar el state
     private val _uiState = MutableStateFlow(DayActivityState())
     val uiState: StateFlow<DayActivityState> = _uiState
 
+    //Carga las actividades en la pantalla
     fun loadActivities(dayItineraryId: Int) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
             try {
+                //Pasando el ID que es la clave foranea buscamos los activiteies que la tengan y devolvemos una lista de ellas
                 val activities = activityRepository.getActivitiesForDay(dayItineraryId)
+                //Actualizamos el state, quitando la pantalla de carga, y cargando las actividades
                 _uiState.value = _uiState.value.copy(
                     activities = activities,
                     isLoading = false

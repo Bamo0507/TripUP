@@ -35,11 +35,13 @@ fun DayInfoRoute(
     onActivityCreated: () -> Unit,
     onBackClick: () -> Unit
 ) {
-    val context = LocalContext.current // Obtener contexto aquí
-
+    // Obtener el contexto e instanciamos el repostiorio
+    val context = LocalContext.current
     val activityRepository = ActivityRepository(
         DatabaseModule.getDatabase(context).activityDao()
     )
+
+    //Creamos el viewmodel con el factory y obtenemos el state
     val viewModel: DayInfoViewModel = viewModel(
         factory = DayInfoViewModelFactory(activityRepository)
     )
@@ -63,6 +65,7 @@ fun DayInfoRoute(
         onBackClick = onBackClick
     )
 }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DayInfoScreen(
@@ -145,7 +148,7 @@ fun DayInfoScreen(
             ) {
                 Button(
                     onClick = onSaveActivity,
-                    enabled = isFormComplete,
+                    enabled = isFormComplete, //se manda la info desde el state
                     shape = MaterialTheme.shapes.large,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary,
@@ -192,12 +195,14 @@ fun TimePickerField(
     )
 }
 
+//Formatear la hora como la necesitamos 8:00
 fun formatDate(dateString: String): String {
     val formatter = DateTimeFormatter.ofPattern("MMMM d", Locale.getDefault())
     val parsedDate = LocalDate.parse(dateString)
     return parsedDate.format(formatter)
 }
 
+//Método para cargar el dialogo del reloj
 fun showTimePickerDialog(
     context: android.content.Context,
     onTimeSelected: (String) -> Unit

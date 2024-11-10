@@ -20,11 +20,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.app.tripup.R
+import com.app.tripup.data.repository.FirebaseLoginRepository
 import com.app.tripup.domain.UserPreferences
 import com.app.tripup.presentation.login.LoginDestination
+import com.app.tripup.presentation.login.LoginViewModel
 import com.app.tripup.presentation.mainFlow.MainNavigationGraph
 import kotlinx.coroutines.delay
 
@@ -35,19 +38,20 @@ fun SplashRoute(
     modifier: Modifier = Modifier
 ) {
     val viewModel: SplashViewModel = viewModel(
-        factory = SplashViewModelFactory(userPreferences)
+        factory = SplashViewModel.Companion.provideFactory(userPreferences)
     )
-    SplashScreen(navController = navController, viewModel = viewModel, modifier = modifier)
+    // Observa el estado del ViewModel
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    SplashScreen(navController = navController, state = uiState, modifier = modifier)
 }
 
 @Composable
 fun SplashScreen(
     navController: NavController,
-    viewModel: SplashViewModel,
+    state: SplashState,
     modifier: Modifier = Modifier
 ) {
-    val isLoggedIn by viewModel.isLoggedIn.collectAsState(initial = null)
-
     // Animación de escala del ícono
     var isVisible by remember { mutableStateOf(false) }
     val scale by animateFloatAsState(
@@ -55,15 +59,17 @@ fun SplashScreen(
         animationSpec = androidx.compose.animation.core.tween(1000)
     )
 
-    LaunchedEffect(isLoggedIn) {
+    LaunchedEffect(state.loggedIn) {
         isVisible = true // Activa la animación
         delay(3000) // Duración de la Splash Screen
 
-        if (isLoggedIn == true) {
+        if (state.loggedIn) {
+            // Navega a la pantalla principal
             navController.navigate(MainNavigationGraph) {
                 popUpTo(SplashDestination) { inclusive = true }
             }
-        } else if (isLoggedIn == false) {
+        } else if (state.loggedIn == false) {
+            // Navega a la pantalla de inicio de sesión
             navController.navigate(LoginDestination) {
                 popUpTo(SplashDestination) { inclusive = true }
             }

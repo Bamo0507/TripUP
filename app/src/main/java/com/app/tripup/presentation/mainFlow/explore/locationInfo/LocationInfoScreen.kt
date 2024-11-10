@@ -35,6 +35,7 @@ fun LocationInfoRoute(
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(placeId, countryName) {
+        //Actualizamos el state para manejar la info recibida y tener el Place a la mano
         viewModel.loadPlaceInfo(placeId, countryName)
     }
 
@@ -164,14 +165,18 @@ fun BottomButtons(modifier: Modifier = Modifier, state: LocationInfoState) {
         Spacer(modifier = Modifier.weight(1f))
 
         Button(
+            //Se hace un Intent para buscar info del lugar en Google
             onClick = {
+                //Creamos un intent para abrir la app de Google
                 val intent = Intent(Intent.ACTION_VIEW).apply {
-                    val placeName = state.place?.name ?: ""
+                    val placeName = state.place?.name ?: "" //Obtenemos el lugar del lugar guardado en el state
+                    //Se parse el Uri que es lo que se va a buscar, se mando la estructura básica de una búsqueda en google
+                    //Después de $ se coloca lo que se quiere que se busque
                     data = Uri.parse("https://www.google.com/search?q=${Uri.encode(placeName)}")
                 }
                 context.startActivity(intent)
             },
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer),
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
             modifier = Modifier
                 .padding(start = 8.dp)
         ) {

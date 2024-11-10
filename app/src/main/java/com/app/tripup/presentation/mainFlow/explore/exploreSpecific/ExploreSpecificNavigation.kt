@@ -24,14 +24,13 @@ fun NavController.navigateToSpecificScreen(
     )
 }
 
-
 fun NavGraphBuilder.specificScreen(
     onBackClick: () -> Unit,
     onPlaceClick: (Place) -> Unit
 ){
     composable<EspecficExploreDestination>{ backStackEntry ->
+        //Con el backstackentry logramos saber qué se mandó de la pantalla anterior, que sería el query
         val destination: EspecficExploreDestination = backStackEntry.toRoute()
-
         ExploreSpecificRoute(
             onBackClick = onBackClick,
             onPlaceClick = onPlaceClick,

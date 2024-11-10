@@ -6,7 +6,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 
-
+//UI del bottom bar
 @Composable
 fun BottomNavBar(
     checkItemSelected: (Any) -> Boolean,
@@ -19,6 +19,7 @@ fun BottomNavBar(
                 selected = isItemSelected,
                 label = {Text(navItem.title)},
                 onClick = {
+                    // Navegar a la pantalla correspondiente
                     onNavItemClick(navItem.destination)
                 },
                 icon = {

@@ -58,17 +58,20 @@ fun MainExploreRoute(
     onPlaceClick: (Place) -> Unit,
     onNavigateToSpecific: (String) -> Unit
 ) {
+    //Manejamos el context y el state
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
-    // Estado para almacenar el país actual
+    // Estado para almacenar el país actual (donde esté el usuario)
     var currentCountry by remember { mutableStateOf<String?>(null) }
 
-    // Estado para controlar si ya hemos solicitado permisos
+    // Estado para controlar si ya hemos solicitado permisos - evitamos que se pida a cada rato
     var hasRequestedPermission by remember { mutableStateOf(false) }
 
+    // Se genera un MANIFEST que establece el permiso que se necesita, en este caso la ubicación
     val locationPermission = Manifest.permission.ACCESS_FINE_LOCATION
 
+    // Estado para controlar si el permiso está concedido
     val permissionGranted = remember {
         mutableStateOf(
             ContextCompat.checkSelfPermission(
@@ -78,6 +81,8 @@ fun MainExploreRoute(
         )
     }
 
+    // Lanza la solicitud de permiso al usuario
+    // Dependiendo de lo que pase, se cambiará el valor de permissionGranted
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
         onResult = { isGranted ->
@@ -86,6 +91,7 @@ fun MainExploreRoute(
     )
 
     // Si el permiso no está concedido, solicitarlo
+    //SideEffect se coloca para que se pida el permiso sin afectar el ciclo de la UI
     if (!permissionGranted.value && !hasRequestedPermission) {
         SideEffect {
             permissionLauncher.launch(locationPermission)
@@ -96,8 +102,10 @@ fun MainExploreRoute(
     // Obtener la ubicación y el país actual cuando se conceda el permiso
     LaunchedEffect(permissionGranted.value) {
         if (permissionGranted.value) {
-            val country = getCurrentCountry(context)
+            //Se obtiene la ubicación actual
+            val country = viewModel.getCurrentCountry(context)
             currentCountry = country
+            //Si se obtiene el país, cargar los lugares (en el viewmodel se hace la búsqueda con el repositorio)
             if (country != null) {
                 viewModel.loadPlacesForCountry(country)
             } else {
@@ -105,7 +113,7 @@ fun MainExploreRoute(
                 viewModel.loadPlacesForCountry("") // Esto cargará una lista vacía
             }
         } else {
-            // Si no se concede el permiso, cargar una lista vacía
+            // Si no se concede el permiso, cargar una lista vacía por default
             viewModel.loadPlacesForCountry("") // Esto cargará una lista vacía
         }
     }
@@ -121,60 +129,10 @@ fun MainExploreRoute(
     )
 }
 
-
-suspend fun getCurrentCountry(context: Context): String? {
-    return withContext(Dispatchers.IO) {
-        try {
-            val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
-            val location = fusedLocationClient.lastLocation.await()
-
-            val finalLocation = location ?: run {
-                // Solicitar una única actualización de ubicación
-                val cancellationTokenSource = com.google.android.gms.tasks.CancellationTokenSource()
-                val currentLocation = fusedLocationClient.getCurrentLocation(
-                    Priority.PRIORITY_HIGH_ACCURACY,
-                    cancellationTokenSource.token
-                ).await()
-                // Limpiar el CancellationTokenSource después de usarlo
-                cancellationTokenSource.cancel()
-                currentLocation
-            }
-
-            if (finalLocation != null) {
-                // Verificar si Geocoder está presente en el dispositivo
-                if (Geocoder.isPresent()) {
-                    val geocoder = Geocoder(context, Locale.getDefault())
-                    val addresses = geocoder.getFromLocation(finalLocation.latitude, finalLocation.longitude, 1)
-                    if (addresses?.isNotEmpty() == true) {
-                        addresses[0].countryName
-                    } else null
-                } else {
-                    Log.e("GeocoderError", "Geocoder not available on this device")
-                    null
-                }
-            } else {
-                Log.e("LocationError", "Location is null")
-                null
-            }
-        } catch (e: SecurityException) {
-            Log.e("LocationError", "Location permission not granted", e)
-            null
-        } catch (e: IOException) {
-            Log.e("GeocoderError", "Geocoding failed", e)
-            null
-        } catch (e: Exception) {
-            Log.e("LocationError", "Error getting location", e)
-            null
-        }
-    }
-}
-
-
-
 @Composable
 fun ExploreScreen(
     state: MainExploreState,
-    onPlaceClick: (Place) -> Unit, // Cambiado a Place en lugar de Int
+    onPlaceClick: (Place) -> Unit,
     onSearch: (String) -> Unit
 ){
     var query by remember { mutableStateOf("") }
@@ -274,7 +232,7 @@ fun ExploreScreen(
 fun SearchBar(
     query: String,
     onQueryChange: (String) -> Unit,
-    onSearch: () -> Unit // Función para manejar el evento de búsqueda
+    onSearch: () -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -316,7 +274,7 @@ fun SearchBar(
                         onSearch() // Al presionar "Enter" realiza la búsqueda
                     }
                 ),
-                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search)
+                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search) //Establece que la acción es de búsqueda
             )
         }
     }

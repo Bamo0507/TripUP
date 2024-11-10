@@ -11,17 +11,21 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class ItinerarySelectionViewModel(
+    //Inyectamos los 3 repositorios
     private val dayItineraryRepository: DayItineraryRepository,
     private val itineraryRepository: ItineraryRepository,
     private val activityRepository: ActivityRepository
 ) : ViewModel() {
 
+    //Variables para manejar el state
     private val _uiState = MutableStateFlow(ItinerarySelectionState())
     val uiState: StateFlow<ItinerarySelectionState> = _uiState
 
+    //Función para cargar los datos, se pasa el id del itinerario, así sabemos qué buscar
     fun loadDaysWithActivityCount(itineraryId: Int) {
-        viewModelScope.launch {
+        viewModelScope.launch { //Se lanza la corrutina
             try {
+                //Obtenemos los días del itinerario, así como el itinerario asociado al ID
                 val days = dayItineraryRepository.getDaysForItinerary(itineraryId)
                 val itinerary = itineraryRepository.getItineraryById(itineraryId)
 
@@ -31,6 +35,7 @@ class ItinerarySelectionViewModel(
                     day to activityCount // Retornamos un par (día, conteo de actividades)
                 }
 
+                // Actualizamos el state con los días obtenidos y el título del itinerario
                 _uiState.value = _uiState.value.copy(
                     dayItinerariesWithCount = daysWithActivityCount,
                     itineraryTitle = itinerary?.name ?: "Itinerary",

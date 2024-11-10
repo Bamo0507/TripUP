@@ -38,6 +38,7 @@ fun ExploreSpecificRoute(
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
     // Ejecuta la búsqueda solo una vez por término
+    //Ya tendremos a la mano en el state la lista para usarla
     LaunchedEffect(query) {
         viewModel.searchPlaces(query)
     }

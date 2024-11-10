@@ -38,13 +38,19 @@ fun ItineraryMainRoute(
     onItinerarySelected: (Int) -> Unit,
     onCreateItinerary: () -> Unit
 ) {
+    //Se maneja el context, obtenemos el repositorio que corresponde a los itinerarios
     val context = LocalContext.current
     val itineraryRepository = ItineraryRepository(
         DatabaseModule.getDatabase(context).itineraryDao()
     )
+
+    //Se genera el viewmodel
     val viewModel: ItineraryMainViewModel = viewModel(
+        //no es necesario hacer un launchedEffect, como solo se usa un método
+        //se decidió manejarlo con un init, por lo tanto ya el state tiene la lista de itinerarios
         factory = ItineraryMainViewModelFactory(itineraryRepository)
     )
+    //Se obtiene el state
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     ItineraryMainScreen(
@@ -94,7 +100,7 @@ fun ItineraryMainScreen(
                         ) {
                             Image(
                                 painter = painterResource(id = R.drawable.notfound),
-                                contentDescription = null,  // Accesibilidad (opcional si es decorativa)
+                                contentDescription = null,
                                 contentScale = ContentScale.Fit,
                                 modifier = Modifier.size(250.dp)
                             )
@@ -114,6 +120,7 @@ fun ItineraryMainScreen(
                     items(itineraries) { itinerary ->
                         ItineraryItem(
                             itinerary = itinerary,
+                            //Mandamos el id de lo que se seleccionó
                             onClick = { onItinerarySelected(itinerary.id) }
                         )
                     }
@@ -171,18 +178,21 @@ fun ItineraryItem(
     }
 }
 
+//Método para que se vean las fechas como se quiere
 @SuppressLint("SimpleDateFormat")
 fun formatDateRange(startDate: String, endDate: String): String {
     val inputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-    val outputFormat = SimpleDateFormat("MMMM d", Locale.getDefault()) // Ej: October 10
+    val outputFormat = SimpleDateFormat("MMMM d", Locale.getDefault())
 
+    //Se pasa el string a formato - 2023-11-01 a 2023-11-10 por ejemplo
     val start = inputFormat.parse(startDate)
     val end = inputFormat.parse(endDate)
 
     return if (start != null && end != null) {
+        //Ya bien bien lo pasa a formato Noviembre 11 por ejemplo
         "${outputFormat.format(start)} - ${outputFormat.format(end)}"
     } else {
-        "$startDate - $endDate" // Fallback en caso de error
+        "$startDate - $endDate"
     }
 }
 

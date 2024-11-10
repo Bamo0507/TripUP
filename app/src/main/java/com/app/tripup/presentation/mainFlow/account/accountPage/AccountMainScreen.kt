@@ -61,10 +61,12 @@ fun AccountRoute(
     onLogoutClick: () -> Unit,
     userPreferences: UserPreferences
 ) {
+    //Se crea el viewmodel con ayuda del factory para poder pasarle UserPreferences
     val viewModel: AccountMainViewModel = viewModel(
         factory = AccountMainViewModel.Factory(userPreferences)
     )
 
+    //Se crea una variable que estará escuchando el UISTATE
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     AccountScreen(
@@ -75,6 +77,8 @@ fun AccountRoute(
         onAvatarClick = {
             viewModel.onAvatarClick()
         },
+        //En los parámetros ya mandamos datos del UISTATE
+        //Pues estos deben mostrarse, uno para el username, el otro para su profile picture
         userName = uiState.userName,
         currentAvatarIndex = uiState.currentAvatarIndex
     )
@@ -113,8 +117,10 @@ fun AccountScreen(
                         .offset(y = 70.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+                    // Aplica un efecto de difuminado cuando va cambiando de index la imagen
                     Crossfade(targetState = currentAvatarIndex) { avatarIndex ->
                         Image(
+                            //Se pasa el ID que devuelva el método al pasarle el index en el que se encuentra el usuario
                             painter = painterResource(id = getAvatarResourceId(avatarIndex)),
                             contentDescription = "User Avatar",
                             modifier = Modifier
@@ -127,7 +133,7 @@ fun AccountScreen(
                         )
                     }
                     Text(
-                        text = userName,
+                        text = userName, //username almacenado en las preferences
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary,
@@ -156,7 +162,8 @@ fun AccountScreen(
     }
 }
 
-
+//Composable para cómo se vería una de las opciones de la cuenta
+//Se hizo para varias, al final solo fue una, pero por eso fue un Composable
 @Composable
 fun AccountOption(
     icon: ImageVector,

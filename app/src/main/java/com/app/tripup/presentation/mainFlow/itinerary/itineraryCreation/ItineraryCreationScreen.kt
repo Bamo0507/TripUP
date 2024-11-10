@@ -33,6 +33,7 @@ fun ItineraryCreationRoute(
     onItineraryCreated: (Int) -> Unit,
     onBackClick: () -> Unit
 ) {
+    //Manejamos el context y creamos las instancias de los 2 repositorios que se necesitan
     val context = LocalContext.current
     val itineraryRepository = ItineraryRepository(
         DatabaseModule.getDatabase(context).itineraryDao()
@@ -40,12 +41,17 @@ fun ItineraryCreationRoute(
     val dayItineraryRepository = DayItineraryRepository(
         DatabaseModule.getDatabase(context).dayItineraryDao()
     )
+
+    //Se crea una instancia del videmodel con los repositorios que se necesitan
     val viewModel: ItineraryCreationViewModel = viewModel(
         factory = ItineraryCreationViewModelFactory(itineraryRepository, dayItineraryRepository)
     )
+
+    //Observamos el state
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    // Handle navigation when the itinerary is saved
+    // Se lanza un effect para actualizar el state, esto se necesita para la navegación
+    // Como de aquí necesitamos irnos a la pantalla de itinerary, y para eso necesitamos el id del itinerario
     LaunchedEffect(uiState.isSaved) {
         if (uiState.isSaved) {
             uiState.itineraryId?.let { id ->
@@ -119,12 +125,13 @@ fun ItineraryCreationScreen(
 
             )
 
+            //Se llama al método de datepickerfield mandandole el placeholder
             DatePickerField(
                 label = stringResource(id = R.string.start_time),
                 date = startDate,
                 onDateSelected = onStartDateChanged
             )
-
+            //Se llama al método de datepickerfield mandandole el placeholder
             DatePickerField(
                 label = stringResource(id=R.string.end_time),
                 date = endDate,
@@ -135,7 +142,7 @@ fun ItineraryCreationScreen(
                 Button(
                     modifier = Modifier.padding(vertical = 16.dp),
                     onClick = onSaveItinerary,
-                    enabled = isFormComplete,
+                    enabled = isFormComplete, // Habilitar el botón solo si el formulario está completo
                     shape = MaterialTheme.shapes.large,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary,
@@ -163,8 +170,11 @@ fun DatePickerField(
     date: String,
     onDateSelected: (String) -> Unit
 ) {
+    //Se obtiene el contexto
     val context = LocalContext.current
+    //Se indica el patrón de fecha que se necesita
     val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+    //Guardamos la fecha
     val dateState = remember { mutableStateOf(date) }
 
     OutlinedTextField(
@@ -199,18 +209,21 @@ fun DatePickerField(
                 }
             }
         },
-        readOnly = true,
+        readOnly = true, //Se pone como read only, para que no bloque el .click que se le puso al icono
         modifier = Modifier.fillMaxWidth()
     )
 }
+
 
 fun showDatePickerDialog(
     context: android.content.Context,
     initialDate: LocalDate,
     onDateSelected: (LocalDate) -> Unit
 ) {
+    //Abre un datepickerdialog
     val datePickerDialog = DatePickerDialog(
         context,
+        //Se le pasa un lambda que recibe día, mes y año para construcir un LocalDate
         { _, year, month, dayOfMonth ->
             val selectedDate = LocalDate.of(year, month + 1, dayOfMonth)
             onDateSelected(selectedDate)
@@ -219,7 +232,7 @@ fun showDatePickerDialog(
         initialDate.monthValue - 1,
         initialDate.dayOfMonth
     )
-    datePickerDialog.show()
+    datePickerDialog.show() //muestra el dialogo en pantalla
 }
 
 

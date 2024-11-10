@@ -25,6 +25,7 @@ fun NavController.navigateToLocationInfoScreen(
 
 fun NavGraphBuilder.locationInfoScreen(onBackClick: () -> Unit){
     composable<LocationInfoDestination>{ backStackEntry ->
+        //Recibe el id y el countryname, de esta forma se sabe qué nodo buscar, y luego el id para mostrar la información esperada
         val destination: LocationInfoDestination = backStackEntry.toRoute()
         LocationInfoRoute(
             placeId = destination.placeId,

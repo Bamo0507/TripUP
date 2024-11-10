@@ -30,7 +30,6 @@ import com.app.tripup.presentation.mainFlow.explore.exploreGraph
 import com.app.tripup.presentation.mainFlow.itinerary.itineraryGraph
 import com.app.tripup.presentation.navigation.BottomNavBar
 
-
 @Composable
 fun MainFlowScreen(
     navController: NavHostController = rememberNavController(),
@@ -79,6 +78,7 @@ fun MainFlowScreen(
             startDestination = ExploreNavGraph,
             modifier = Modifier.padding(innerPadding)
         ){
+            //3 flujos principales de navegación se declaran
             exploreGraph(navController)
 
             accountGraph(navController, userPreferences, onLogoutClick)

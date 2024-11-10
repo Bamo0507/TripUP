@@ -8,14 +8,17 @@ import com.app.tripup.presentation.mainFlow.account.accountPage.AccountDestinati
 import com.app.tripup.presentation.mainFlow.account.accountPage.accountScreen
 import kotlinx.serialization.Serializable
 
+//Objeto de identificación
 @Serializable
 data object AccountNavGraph
 
+//Método del navgraphbuilder que se llama para mandar navegación y preferences sobre la screen (cómo manejar)
 fun NavGraphBuilder.accountGraph(
     navController: NavController,
     userPreferences: UserPreferences,
     onLogoutClick: () -> Unit
 ) {
+    //Se maneja como si fuera navegación anidada, porque originalmente se iba a manejar un flujo más complejo
     navigation<AccountNavGraph>(
         startDestination = AccountDestination
     ) {
