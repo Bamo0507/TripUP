@@ -57,7 +57,6 @@ class LoginViewModel(
         return context.getString(error.text)
     }
 
-
     //Listado de eventos de login
     fun onLoginEvent(event: LoginEvent, context: Context) {
         //When acrode al tipo de evento se manda a llamar a su respectivo método

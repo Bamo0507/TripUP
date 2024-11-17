@@ -58,7 +58,6 @@ fun SplashScreen(
         targetValue = if (isVisible) 1f else 0.5f,
         animationSpec = androidx.compose.animation.core.tween(1000)
     )
-
     LaunchedEffect(state.loggedIn) {
         isVisible = true // Activa la animación
         delay(3000) // Duración de la Splash Screen

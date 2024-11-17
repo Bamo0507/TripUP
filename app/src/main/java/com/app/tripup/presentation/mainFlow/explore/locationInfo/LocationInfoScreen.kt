@@ -29,7 +29,7 @@ import com.app.tripup.presentation.ui.theme.MyApplicationTheme
 fun LocationInfoRoute(
     placeId: Int,
     countryName: String,
-    viewModel: LocationInfoViewModel = viewModel(),
+    viewModel: LocationStateViewModel = viewModel(),
     onNavigateBack: () -> Unit
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()

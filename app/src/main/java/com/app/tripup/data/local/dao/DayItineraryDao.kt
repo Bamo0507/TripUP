@@ -6,10 +6,6 @@ import com.app.tripup.data.local.entities.DayItinerary
 //Dao para un día de itinerario
 @Dao
 interface DayItineraryDao {
-    //Consulta para obtener todos los días de un itinerario sea el mismo que el ID que se mande
-    @Query("SELECT * FROM day_itineraries WHERE id = :id")
-    suspend fun getDayItineraryById(id: Int): DayItinerary?
-
     //Eliminar un día de itinerario, aún se debate si se implementará o no
     @Delete
     suspend fun deleteDayItinerary(dayItinerary: DayItinerary)

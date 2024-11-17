@@ -117,11 +117,11 @@ fun LoginScreen(
                         .clip(RoundedCornerShape(16.dp))
                         .border(
                             width = 2.dp,
-                            color = if (loginState.showError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+                            color = placeholderColor,
                             shape = RoundedCornerShape(16.dp)
                         ),
                     colors = TextFieldDefaults.outlinedTextFieldColors(
-                        focusedBorderColor = if (loginState.showError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+                        focusedBorderColor = placeholderColor,
                         unfocusedBorderColor = if (loginState.showError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
                         cursorColor = MaterialTheme.colorScheme.onSurface,
                     )
@@ -161,12 +161,12 @@ fun LoginScreen(
                         .clip(RoundedCornerShape(16.dp))
                         .border(
                             width = 2.dp,
-                            color = if (loginState.showError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+                            color = placeholderColor,
                             shape = RoundedCornerShape(16.dp)
                         ),
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(), //LÍNEA para que se vea o no como una transformación visual
                     colors = TextFieldDefaults.outlinedTextFieldColors(
-                        focusedBorderColor = if (loginState.showError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+                        focusedBorderColor = placeholderColor,
                         unfocusedBorderColor = if (loginState.showError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
                         cursorColor = MaterialTheme.colorScheme.onSurface,
                     )

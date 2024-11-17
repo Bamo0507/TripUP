@@ -50,7 +50,7 @@ fun DayInfoRoute(
     DayInfoScreen(
         itineraryTitle = itineraryTitle,
         date = date,
-        context = context,  // Pasar el contexto a la pantalla
+        context = context,
         activityName = uiState.activityName,
         startTime = uiState.startTime,
         endTime = uiState.endTime,

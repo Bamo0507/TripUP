@@ -13,8 +13,6 @@ class DayItineraryRepository(private val dayItineraryDao: DayItineraryDao) {
     suspend fun getDaysForItinerary(itineraryId: Int): List<DayItinerary> {
         return dayItineraryDao.getDaysForItinerary(itineraryId)
     }
-    //Probablemente no se utilice
-    suspend fun getDayItineraryById(id: Int): DayItinerary? = dayItineraryDao.getDayItineraryById(id)
     //Se evalúa su incorporación al programa
     suspend fun deleteDayItinerary(dayItinerary: DayItinerary) = dayItineraryDao.deleteDayItinerary(dayItinerary)
 }
