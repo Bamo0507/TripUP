@@ -28,13 +28,6 @@ TripUp tiene como objetivo ayudar a los viajeros a dedicar menos tiempo a la pla
 
 ---
 
-**Nota:** Para probar la aplicación en su estado actual, se utiliza un repositorio local para la autenticación con las siguientes credenciales:
-
-- **Usuario:** `1`
-- **Contraseña:** `1`
-
----
-
 ## Servicios
 
 Para ofrecer una experiencia completa y funcional, TripUp utilizará los siguientes servicios:
@@ -46,14 +39,6 @@ Hemos evaluado el uso de servicios externos para obtener información de lugares
 - **Firebase Realtime Database:** Implementaremos una base de datos en Firebase donde almacenaremos información detallada sobre lugares turísticos, incluyendo su clasificación, imágenes y descripciones. Al desarrollar nosotros mismos esta base de datos, podemos personalizar el contenido y asegurarnos de que se ajuste a las necesidades de nuestros usuarios.
 
 - **Firebase Authentication con Google Sign-In:** Para el manejo de la autenticación de usuarios, utilizaremos Firebase Authentication en combinación con Google Sign-In. Esto permitirá a los usuarios registrarse y acceder a la aplicación utilizando sus cuentas de Google, facilitando el proceso de inicio de sesión y mejorando la seguridad.
-
-**Nota:** Actualmente, Firebase aún no está implementado en la aplicación. Por el momento, estamos utilizando una base de datos local para manejar la información de los lugares y un repositorio local para la autenticación de usuarios con credenciales predefinidas (usuario: `1`, contraseña: `1`). Planeamos migrar a Firebase en la siguiente versión.
-
-### Servicios Propios (Desarrollados por Nosotros)
-
-- **Base de Datos Local:** Mientras completamos la integración con Firebase, utilizamos una base de datos local integrada en la aplicación para manejar los datos de los lugares turísticos y usuarios. Esto nos permite desarrollar y probar funcionalidades sin depender de una conexión a internet, esta información se encuentra en los archivos `PlaceDb.kt` y `SearchPlaceDb.kt`.
-
-- **Repositorio Local para Autenticación:** Actualmente, para fines de prueba, tenemos un repositorio local que verifica el inicio de sesión con credenciales predefinidas. Este enfoque nos permite validar la funcionalidad de autenticación mientras implementamos la solución basada en Firebase. Esto ya se mencionó anteriormente en caso de probar la aplicación.
 
 ## Librerías
 
@@ -85,17 +70,6 @@ Aunque todavía no hemos integrado Firebase, planeamos utilizar los siguientes S
 
   ```kotlin
   implementation("com.google.android.gms:play-services-auth:20.5.0")
-  ```
-
-## Nota Importante
-A medida que avancemos en el desarrollo e integremos Firebase y Google Sign-In, actualizaremos las dependencias y adaptaremos la arquitectura de la aplicación para aprovechar al máximo estas tecnologías.
-
-Además, es imporante mencionar que para que funcionen correctamente las librerías indicadas anteriormente se deben habilitar los servicios de Google en el Gradle, esto se hace en el archivo `build.gradle.kts`, y lo único que se debe hacer es incluir lo siguiente:
-
- ```kotlin
-  plugins {
-      id("com.google.gms.google-services")
-  }
   ```
 
 
